@@ -5,12 +5,9 @@ pipeline{
     AWS_SECRET_ACCESS_KEY      = credentials('aws_secret_access_key')
     AWS_ACCOUNT_ID             = credentials('aws_account_id')
     
-    APP_NAME                   = "article"
+    PROJECT_NAME               = "article"
 
-    TF_VAR_tag                 = "${env.BUILD_NUMBER}"
-    TF_VAR_app_name            = "${APP_NAME}"
-    TF_VAR_resource_name       = "${RESOURCE_NAME}"
-    TF_VAR_ms_name             = "${MS_NAME}"
+    TF_VAR_project_name        = "${PROJECT_NAME}"
   }
   tools {
     terraform 'TerraformDefault'
@@ -20,7 +17,7 @@ pipeline{
   }
   stages{
     stage('Deploy'){
-      when { changeset "iac/**"}
+      // when { changeset "iac/**"}
       steps{
         dir('iac'){
           sh 'terraform init -input=false'
