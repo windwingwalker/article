@@ -1,0 +1,17 @@
+{
+    "name": "docker_web_app",
+    "version": "1.0.0",
+    "description": "Node.js on Docker",
+    "author": "First Last <first.last@example.com>",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "nodemon src/stage-controller.ts",
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@types/node": "^17.0.19",
+        "nodemon": "^2.0.15",
+        "ts-node": "^10.5.0",
+        "typescript": "^4.5.5"
+    }
+}
