@@ -15,6 +15,8 @@ pipeline{
     TF_VAR_ms_name             = "${MS_NAME}"
     TF_VAR_http_method         = "${HTTP_METHOD}"
     TF_VAR_image_tag           = "${env.BUILD_NUMBER}"
+
+    HOME                       = "."
   }
   tools {
     terraform 'TerraformDefault'
