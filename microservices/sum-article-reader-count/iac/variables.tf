@@ -6,7 +6,7 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-variable "app_name" {
+variable "project_name" {
   type = string 
 }
 
@@ -14,7 +14,7 @@ variable "ms_name" {
   type = string 
 }
 
-variable "tag" {
+variable "image_tag" {
   type = string
 }
 
