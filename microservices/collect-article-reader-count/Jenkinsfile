@@ -23,11 +23,11 @@ pipeline{
     ansiColor('xterm')
   }
   stages{
-    stage('Gather Files'){
-      steps{
-        sh "rsync -av model/ microservices/${MS_NAME}/model"
-      }
-    }
+    // stage('Gather Files'){
+    //   steps{
+    //     sh "rsync -av model/ microservices/${MS_NAME}/model"
+    //   }
+    // }
     stage('Compile'){
       agent {
         docker {
@@ -53,7 +53,7 @@ pipeline{
         }
         dir("microservices/${MS_NAME}/"){
           script{
-            image = docker.build("${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${MS_NAME}:${TF_VAR_tag}")
+            image = docker.build("${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${MS_NAME}:${TF_VAR_image_tag}")
           }
         }
       }
