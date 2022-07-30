@@ -22,4 +22,4 @@ COPY node_modules/ ./
 
 COPY dist/ ./
 
-CMD [ "remote-controller.lambdaHandler" ]
+CMD [ "microservices/get-article-catalog/remote-controller.lambdaHandler" ]
