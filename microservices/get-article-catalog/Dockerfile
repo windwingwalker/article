@@ -21,5 +21,4 @@ COPY node_modules/ ./
 # RUN npm install
 
 COPY dist/ ./
-
-CMD [ "microservices/get-article-catalog/remote-controller.lambdaHandler" ]
+CMD [ "microservices/get-article-catalog/src/remote-controller.lambdaHandler" ]
