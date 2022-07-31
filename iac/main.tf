@@ -21,6 +21,7 @@ provider "aws" {
 module "api-gateway" {
   source = "./modules/api-gateway"
   project_name = var.project_name
+  aws_account_id = var.aws_account_id
 }
 
 module "resource_group" {

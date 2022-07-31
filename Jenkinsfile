@@ -8,6 +8,7 @@ pipeline{
     PROJECT_NAME               = "article"
 
     TF_VAR_project_name        = "${PROJECT_NAME}"
+    TF_VAR_aws_account_id      = "${AWS_ACCOUNT_ID}"
   }
   tools {
     terraform 'TerraformDefault'
