@@ -20,6 +20,7 @@ variable "ms_name" {
 
 variable "http_method" {
   type = string
+  default = "GET"
 }
 
 variable "image_tag" {
