@@ -8,4 +8,4 @@ COPY node_modules/ ./
 
 COPY dist/ ./
 
-CMD [ "remote-controller.lambdaHandler" ]
+CMD [ "microservices/update-article-catalog/src/remote-controller.lambdaHandler" ]
