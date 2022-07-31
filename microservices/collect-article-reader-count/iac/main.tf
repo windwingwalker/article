@@ -22,7 +22,7 @@ module "lambda" {
   source = "../../../iac/modules/lambda/"
   ms_name = var.ms_name
   image_tag = var.image_tag
-  lambda_env_var = {sqs_queue_url = module.sqs.sqs_queue_url}
+  lambda_env_var = {SQS_QUEUE_URL = module.sqs.sqs_queue_url}
 }
 
 module "api" {
