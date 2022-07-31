@@ -13,25 +13,26 @@ provider "aws" {
   region = var.aws_region
   default_tags {
     tags = {
-      "app" = var.app_name
+      "Project" = var.project_name
     }
   }
 }
 
 module "lambda" {
-  source = "./modules/lambda/"
-  app_name = var.app_name
-  resource_name = var.resource_name
+  source = "../../../iac/modules/lambda/"
   ms_name = var.ms_name
-  tag = var.tag
+  image_tag = var.image_tag
+  lambda_env_var = {API_ID = "xvswxp2a96"}
 }
 
 module "api" {
-  source = "./modules/api/"
-  app_name = var.app_name
+  source = "../../../iac/modules/api-route/"
+  project_name = var.project_name
   resource_name = var.resource_name
   ms_name = var.ms_name
   aws_region = var.aws_region
-  aws_account_id = var.aws_account_id
   function_arn = module.lambda.function_arn
+  http_method = var.http_method
+  authorizer_id = "npizu5"
+  authorization = "COGNITO_USER_POOLS"
 }

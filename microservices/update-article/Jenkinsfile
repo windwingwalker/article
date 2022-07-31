@@ -15,7 +15,8 @@ pipeline{
     TF_VAR_ms_name             = "${MS_NAME}"
     TF_VAR_http_method         = "${HTTP_METHOD}"
     TF_VAR_image_tag           = "${env.BUILD_NUMBER}"
-    TF_VAR_aws_account_id      = "${AWS_ACCOUNT_ID}"
+    
+    HOME                       = "." //For npm install path
   }
   tools {
     terraform 'TerraformDefault'
