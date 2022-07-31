@@ -21,34 +21,6 @@ provider "aws" {
   region = var.aws_region
   default_tags {
     tags = {
-      "app" = var.app_name
-    }
-  }
-}
-
-module "lambda" {
-  source = "./modules/lambda/"
-  app_name = var.app_name
-  ms_name = var.ms_name
-  tag = var.tag
-}
-
-module "api" {
-  source = "../../../iac/modules/api-method/"
-  app_name = var.app_name
-  resource_name = var.resource_name
-  ms_name = var.ms_name
-  aws_region = var.aws_region
-  function_arn = module.lambda.function_arn
-  http_method = "PUT"
-  authorizer_id = "wpnlml"
-  authorization = "COGNITO_USER_POOLS"
-}
-
-provider "aws" {
-  region = var.aws_region
-  default_tags {
-    tags = {
       "Project" = var.project_name
     }
   }
@@ -69,6 +41,6 @@ module "api" {
   aws_region = var.aws_region
   function_arn = module.lambda.function_arn
   http_method = var.http_method
-  authorizer_id = "wpnlml"
+  authorizer_id = "npizu5"
   authorization = "COGNITO_USER_POOLS"
 }
