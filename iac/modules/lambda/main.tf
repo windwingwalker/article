@@ -31,6 +31,7 @@ resource "aws_lambda_function" "default" {
   image_uri            = "${aws_ecr_repository.default.repository_url}:${var.image_tag}"
   role                 = data.aws_iam_role.default.arn
   publish              = true
+  timeout              = var.timeout
   
   # Optional
   dynamic "environment" {

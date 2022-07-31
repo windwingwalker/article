@@ -13,20 +13,22 @@ provider "aws" {
   region = var.aws_region
   default_tags {
     tags = {
-      "app" = var.app_name
+      "Project" = var.project_name
     }
   }
 }
 
 module "lambda" {
-  source = "./modules/lambda/"
-  app_name = var.app_name
+  source = "../../../iac/modules/lambda/"
   ms_name = var.ms_name
-  tag = var.tag
+  image_tag = var.image_tag
+  lambda_env_var = {API_ID = "xvswxp2a96"}
 }
 
 module "eventbridge" {
-  source = "./modules/eventbridge"
+  source = "../../../iac/modules/eventbridge"
   ms_name = var.ms_name
   function_arn = module.lambda.function_arn
+  description = "Fires at 3am UTC+8 daily"
+  schedule_expression = "cron(0 21 * * ? *)"
 }

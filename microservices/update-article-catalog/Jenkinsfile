@@ -13,6 +13,8 @@ pipeline{
     TF_VAR_resource_name       = "${RESOURCE_NAME}"
     TF_VAR_ms_name             = "${MS_NAME}"
     TF_VAR_image_tag           = "${env.BUILD_NUMBER}"
+
+    HOME                       = "." //For npm install path
   }
   tools {
     terraform 'TerraformDefault'
