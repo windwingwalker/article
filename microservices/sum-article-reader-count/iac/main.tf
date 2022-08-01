@@ -22,7 +22,7 @@ module "lambda" {
   source = "../../../iac/modules/lambda/"
   ms_name = var.ms_name
   image_tag = var.image_tag
-  lambda_env_var = {API_ID = "xvswxp2a96"}
+  lambda_env_var = null
 }
 
 resource "aws_lambda_event_source_mapping" "default" {

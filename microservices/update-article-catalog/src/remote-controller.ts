@@ -23,13 +23,13 @@ exports.lambdaHandler = async (event, context) => {
    * 5) When loop end, update the whole article catalog to db
    */
   try {
-    const articleCatalogResponse: AxiosResponse = await axios.get<ArticleCatalog>(`https://${process.env.API_ID}.execute-api.us-east-1.amazonaws.com/prod/article-catalog`)
+    const articleCatalogResponse: AxiosResponse = await axios.get<ArticleCatalog>(`https://api.windwingwalker.xyz/article/article-catalog`)
     if (articleCatalogResponse["status"] == 404) throw new ArticleCatalogNotFoundError();
     var articleCatalog: ArticleCatalog = articleCatalogResponse["data"] as ArticleCatalog;
 
     for (var i = 0; i < articleCatalog["body"].length; i++){
       const firstPublished = articleCatalog["body"][i]["firstPublished"]
-      const articleResponse: AxiosResponse = await axios.get(`https://${process.env.API_ID}.execute-api.us-east-1.amazonaws.com/prod/article?firstPublished=${firstPublished}`)
+      const articleResponse: AxiosResponse = await axios.get(`https://api.windwingwalker.xyz/article/article?firstPublished=${firstPublished}`)
       if (articleResponse["status"] == 404) throw new ArticleNotFoundError(firstPublished);
       var article: Article = articleResponse["data"] as Article;
 

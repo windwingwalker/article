@@ -49,7 +49,7 @@ exports.lambdaHandler = async (event: SQSEvent, context) => {
       const firstPublished: string = message["body"]
       console.info("Message is: " + firstPublished)
 
-      const articleResponse: AxiosResponse = await axios.get(`https://${process.env.API_ID}.execute-api.us-east-1.amazonaws.com/prod/article?firstPublished=${firstPublished}`)
+      const articleResponse: AxiosResponse = await axios.get(`https://api.windwingwalker.xyz/article/article?firstPublished=${firstPublished}`)
       if (articleResponse["status"] == 404) throw new ArticleNotFoundError(firstPublished);
       var article: Article = articleResponse["data"] as Article;
     
