@@ -25,8 +25,10 @@ variable "http_method" {
 
 variable "authorizer_id" {
   type    = string
+  default = null
 }
 
 variable "authorization" {
   type    = string
+  default = "NONE"
 }
