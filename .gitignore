@@ -37,11 +37,21 @@
 
 # Misc
 **/.terraform.lock.hcl
-**/__pycache__/
-**/package/
-**/export/
+
+## Nodejs
 **/node_modules/
+## Python
+**/__pycache__/
+**/pythonclient/
+## Dev
 **/.devcontainer/
 **/test.md
-**/.DS_Store
+**/response.json
+**/package/
+**/export/
+**/input.csv
 **/dist/
+**/*.zip
+**/*cache*/*
+## Misc
+**/.DS_Store
