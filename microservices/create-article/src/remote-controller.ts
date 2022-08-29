@@ -58,7 +58,7 @@ exports.lambdaHandler = async (event, context) => {
     const plainArticle: PlainArticle = JSON.parse(event["body"]);
     var article: Article = new Article(plainArticle);
 
-    const articleCatalogResponse: AxiosResponse = await axios.get<ArticleCatalog>(`https://${process.env.API_ID}.execute-api.us-east-1.amazonaws.com/prod/article-catalog`)
+    const articleCatalogResponse: AxiosResponse = await axios.get<ArticleCatalog>("https://api.windwingwalker.xyz/article/article-catalog")
     if (articleCatalogResponse["status"] == 404) throw new ArticleCatalogNotFoundError();
     var articleCatalog: ArticleCatalog = articleCatalogResponse["data"] as ArticleCatalog;
 
