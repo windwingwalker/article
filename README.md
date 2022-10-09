@@ -1,7 +1,7 @@
 # Article
 
 ## Background
-The application is one of the back-end application of my blog. The application consists of microservices, each microservice represent an operation about articles.  
+This **repository** stores everything of an application. The **application** is one of the back-end application of my blog. The application consists of **microservices**, each microservice represent an operation about articles.  
 
 ## Repository strusture
 - `README.md`: This file, stating the basic information of the whole repository.
