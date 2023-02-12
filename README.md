@@ -10,6 +10,5 @@ This **repository** stores everything of an application. The **application** is 
 - [LICENSE.md](LICENSE.md): Just a license.
 - [microservices/](microservices/README.md): Store source code of each microservices.
 - [iac/](iac/README.md): Store the infrastructure as code shared across microservices. Currently Terraform.
-- [article-inventory/](article-inventory/README.md): Store the published articles in markdown format.
 - model/: Store the data model shared across microservices.
 - [.gitignore](.gitignore): Just `.gitignore`.
