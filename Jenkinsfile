@@ -14,9 +14,9 @@ pipeline{
 
     HOME                       = "." //For npm install path
   }
-  tools {
-    terraform 'TerraformDefault'
-  }
+  // tools {
+  //   terraform 'TerraformDefault'
+  // }
   options {
     ansiColor('xterm')
   }
