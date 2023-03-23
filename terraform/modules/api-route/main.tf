@@ -22,17 +22,9 @@ resource "aws_api_gateway_integration" "default" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${var.function_arn}:$${stageVariables.alias}/invocations"
+  # uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${var.aws_region}:${var.aws_account_id}:function:${var.function_name}:$${stageVariables.alias}/invocations"
 
   depends_on              = [aws_api_gateway_method.default]
-}
-
-resource "aws_lambda_permission" "api_gw" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = var.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${data.aws_api_gateway_rest_api.default.execution_arn}/*/*"
 }
 
 resource "aws_api_gateway_method_response" "default" {

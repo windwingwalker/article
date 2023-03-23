@@ -81,7 +81,18 @@ export const getLambdaEventSource = (event: any): string => {
 }
 
 export const rewriteArticleCatalog = (articleCatalog: ArticleCatalog, article: Article, articleIndex: number): ArticleCatalog => {
-  const articleMetadata: ArticleMetadata = new ArticleMetadata(article);
+
+  const articleMetadata: ArticleMetadata = new ArticleMetadata(
+    article["firstPublished"],
+    article["lastModified"],
+    article["title"],
+    article["subtitle"],
+    article["type"],
+    article["edition"],
+    article["views"],
+    article["tags"],
+    article["series"]
+  );
 
   if (articleIndex == -1){ // Add new article metadata
     var filoArticles: ArticleMetadata[] = articleCatalog["body"]

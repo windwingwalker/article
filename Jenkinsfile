@@ -10,6 +10,7 @@ pipeline{
     TF_VAR_project_name        = "${PROJECT_NAME}"
     TF_VAR_image_tag           = "${env.BUILD_NUMBER}"
     TF_VAR_aws_account_id      = "${AWS_ACCOUNT_ID}"
+    TF_VAR_aws_region          = "us-east-1"
 
     HOME                       = "." //For npm install path
   }
@@ -51,6 +52,11 @@ pipeline{
         }
       }
     }
+    stage('Provision pre-development infrastructure'){
+      steps{
+        sh 'ls'
+      }
+    }
     stage('Push Image'){
       steps{
         script{
@@ -60,9 +66,22 @@ pipeline{
         }
       }
     }
-    // stage('Deploy'){
+    // stage('Provision development infrastructure'){
     //   steps{
-    //     dir("microservices/${MS_NAME}/terraform"){
+    //     dir("terraform/development"){
+    //       sh 'terraform init -input=false'
+    //       sh 'terraform plan -out=tfplan -input=false'
+    //       sh 'terraform apply -input=false -auto-approve tfplan'
+    //     }
+    //     sh 'rm -rf dist/' 
+    //   }
+    // }
+    // stage('Approve on promotion'){
+
+    // }
+    // stage('Provision production infrastructure'){
+    //   steps{
+    //     dir("terraform/productino"){
     //       sh 'terraform init -input=false'
     //       sh 'terraform plan -out=tfplan -input=false'
     //       sh 'terraform apply -input=false -auto-approve tfplan'

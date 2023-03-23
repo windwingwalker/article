@@ -1,4 +1,3 @@
-# Input variable definitions
 variable "aws_region" {
   description = "AWS region for all resources."
 
@@ -10,14 +9,10 @@ variable "project_name" {
   type = string 
 }
 
-variable "resource_name" {
-  type = string 
+variable "aws_account_id" {
+  type = string
 }
 
-variable "function_name" {
-  type = string 
-}
-
-variable "function_arn" {
-  type = string 
+variable "image_tag" {
+  type = string
 }

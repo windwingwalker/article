@@ -5,7 +5,6 @@ import { getArticleCatalogService, getArticleService, postArticleReaderCountServ
 export const lambdaHandler = async (event, context) => {
   var httpResponse: HTTPResponse = null;
   try {
-    event = JSON.parse(event)
     const source: string = getLambdaEventSource(event)
     console.info("Invoked by source: " + source)
 
@@ -21,7 +20,7 @@ export const lambdaHandler = async (event, context) => {
       }
     } else if (source == "api-put") {
       var resource: string = getAPIResource(event)
-      
+
       if (resource == "/article") {
         httpResponse = await putArticleService(event)
       } else if (resource == "/article-catalog") {

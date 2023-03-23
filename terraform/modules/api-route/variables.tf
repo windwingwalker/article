@@ -7,11 +7,10 @@ variable "resource_name" {
 }
 
 variable "aws_region" {
-  type    = string
-}
+  description = "AWS region for all resources."
 
-variable "function_name" {
   type    = string
+  default = "us-east-1"
 }
 
 variable "function_arn" {
