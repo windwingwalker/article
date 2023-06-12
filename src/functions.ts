@@ -2,52 +2,69 @@ import Article from "./models/Article";
 import ArticleCatalog from "./models/ArticleCatalog";
 import PlainArticle from "./models/PlainArticle";
 import ArticleMetadata from "./models/ArticleMetadata";
-import { ArticleNotFoundError, ArticleCatalogNotFoundError, ArticleCatalogUploadError, ArticleUploadError } from "./models/error";
+// import { ArticleNotFoundError, ArticleCatalogNotFoundError, ArticleCatalogUploadError, ArticleUploadError } from "./models/error";
 
 export const pharseMarkdown = (file: string) => {
   var handlingBody = false;
+  var handlingPoetry = false;
   const fileRawArray: Array<string> = file.split("\n");
   var res: PlainArticle = new PlainArticle();
   res["body"] = [];
+  var poetry = [];
 
   for (const element of fileRawArray) {
-    if (handlingBody){
-      if (element == ""){
+    if (handlingPoetry){
+      if (element == "") {
         continue
-      }else if (element.slice(0, 3) == "###"){
+      }else if (element.slice(0, 9) == "</poetry>") {
+        handlingPoetry = false;
+        res["body"].push({"poetry": poetry});
+        continue;
+      }else {
+        var content = element.slice(0, element.length + 1)
+        poetry.push(content)
+      }
+    } else if (handlingBody) {
+      if (element == "") {
+        continue
+      }else if (element.slice(0, 3) == "###") {
         var content = element.slice(4, element.length + 1)
         res["body"].push({"h3": content})
-      }else if (element.slice(0, 2) == "##"){
+      }else if (element.slice(0, 2) == "##") {
         var content = element.slice(3, element.length + 1)
         res["body"].push({"h2": content})
-      }else if (element.slice(0, 1) == "#"){
+      }else if (element.slice(0, 1) == "#") {
         var content = element.slice(2, element.length + 1)
         res["body"].push({"h1": content})
-      }else{
+      }else if (element.slice(0, 8) == "<poetry>") {
+        handlingPoetry = true
+        poetry = [];
+        continue;
+      }else {
         var content = element.slice(0, element.length + 1)
         res["body"].push({"p": content})
       }
     } else {
       if (element == ""){
         continue
-      } else if (element.slice(0, 2) == "##"){
+      } else if (element.slice(0, 2) == "##") {
         var content = element.slice(3, element.length + 1)
         res["subtitle"] = content;
-      } else if (element.slice(0, 1) == "#"){
+      } else if (element.slice(0, 1) == "#") {
         var content = element.slice(2, element.length + 1)
         res["title"] = content;
       } else if (element.slice(0, 3) == "---") {
         handlingBody = true
         continue;
-      } else if (element.slice(0, 7) == "- type:"){
+      } else if (element.slice(0, 7) == "- type:") {
         res["type"] = element.slice(8, element.length + 1)
-      } else if (element.slice(0, 17) == "- firstPublished:"){
+      } else if (element.slice(0, 17) == "- firstPublished:") {
         res["firstPublished"] = +element.slice(18, element.length + 1)
-      } else if (element.slice(0, 7) == "- tags:"){
+      } else if (element.slice(0, 7) == "- tags:") {
         var tagString = element.slice(8, element.length + 1)
         var tagList = tagString.split(",").map(item => item.trim())
         res["tags"] = tagList
-      } else if (element.slice(0, 9) == "- series:"){
+      } else if (element.slice(0, 9) == "- series:") {
         res["series"] = element.slice(10, element.length + 1)
       }
     }
@@ -94,7 +111,7 @@ export const rewriteArticleCatalog = (articleCatalog: ArticleCatalog, article: A
     article["series"]
   );
 
-  if (articleIndex == -1){ // Add new article metadata
+  if (articleIndex == -1) { // Add new article metadata
     var filoArticles: ArticleMetadata[] = articleCatalog["body"]
     var fifoArticles: ArticleMetadata[] = filoArticles.reverse();
 
@@ -105,7 +122,7 @@ export const rewriteArticleCatalog = (articleCatalog: ArticleCatalog, article: A
     articleCatalog["body"] = filoArticles;
     articleCatalog["count"]++;
 
-  }else{ //Update existing article metadata
+  }else { //Update existing article metadata
     articleCatalog["body"][articleIndex] = articleMetadata;
     
   }
@@ -120,8 +137,8 @@ export const articleIsExisted = (articleCatalog: ArticleCatalog, article: Articl
    * latest article is 0
    */ 
 
-  for (var i = 0; i < articleCatalog["body"].length; i++){
-    if (articleCatalog["body"][i]["firstPublished"] == article["firstPublished"]){
+  for (var i = 0; i < articleCatalog["body"].length; i++) {
+    if (articleCatalog["body"][i]["firstPublished"] == article["firstPublished"]) {
       return i;
     }
   }

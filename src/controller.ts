@@ -12,8 +12,10 @@ export const lambdaHandler = async (event, context) => {
       var resource: string = getAPIResource(event)
 
       if (resource == "/article") {
+        console.info("Calling service getArticleService()");
         httpResponse = await getArticleService(event)
       } else if (resource == "/article-catalog") {
+        console.info("Calling service getArticleCatalogService()");
         httpResponse = await getArticleCatalogService()
       } else {
         throw new Error("Operation not found");
@@ -22,17 +24,22 @@ export const lambdaHandler = async (event, context) => {
       var resource: string = getAPIResource(event)
 
       if (resource == "/article") {
+        console.info("Calling service putArticleService()");
         httpResponse = await putArticleService(event)
       } else if (resource == "/article-catalog") {
+        console.info("Calling service putArticleCatalogService()");
         httpResponse = await putArticleCatalogService(event)
       } else {
         throw new Error("Operation not found");
       }
     } else if (source == "api-post") {
+      console.info("Calling service postArticleReaderCountService()");
       httpResponse = await postArticleReaderCountService(event)
     } else if (source == "sqs") {
+      console.info("Calling service sumArticleReaderCountService()");
       httpResponse = await sumArticleReaderCountService(event)
     } else if (source == "cron") {
+      console.info("Calling service scheduledPutArticleCatalogService()");
       httpResponse = await scheduledPutArticleCatalogService()
     } else {
       throw new Error("Operation not found");

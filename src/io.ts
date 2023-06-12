@@ -4,7 +4,7 @@ import { SQSClient, SendMessageCommand, SendMessageCommandOutput } from "@aws-sd
 import { SSMClient, GetParameterCommand, GetParameterCommandInput, GetParameterCommandOutput } from "@aws-sdk/client-ssm";
 import Article from "./models/Article";
 import ArticleCatalog from "./models/ArticleCatalog";
-import { ArticleNotFoundError, ArticleCatalogNotFoundError, ArticleCatalogUploadError, ArticleUploadError } from "./models/error";
+import { ArticleNotFoundError, ArticleCatalogNotFoundError, ArticleCatalogUploadError, ArticleUploadError } from "./models/Error";
 
 const dynamodbClient = new DynamoDBClient({ region: "us-east-1" });
 const sqsClient = new SQSClient({ region: "us-east-1"});

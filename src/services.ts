@@ -23,7 +23,7 @@ export const putArticleService = async (event): Promise<HTTPResponse> => {
     article = rewriteArticle(articleCatalog, article, articleIndex)
 
   articleCatalog = rewriteArticleCatalog(articleCatalog, article, articleIndex)
-
+  
   await putArticleToDB(article);
   await putArticleCatalogToDB(articleCatalog);
 

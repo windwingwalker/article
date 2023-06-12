@@ -6,6 +6,6 @@ export default class PlainArticle{
   tags: string[];
   series: string;
   body: {
-    [key: string]: string;
+    [key: string]: string | string[];
   }[];
 }

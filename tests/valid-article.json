@@ -17,6 +17,15 @@
     },
     {
      "p": "There are sth"
+    },
+    {
+      "h1": "test-poetry"
+    },
+    {
+      "poetry": [
+        "first line",
+        "second line"
+      ]
     }
    ]
  }

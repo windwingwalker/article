@@ -16,3 +16,10 @@ There are sth
 # test-h1-2
 
 There are sth
+
+# test-poetry
+
+<poetry>
+first line
+second line
+</poetry>
