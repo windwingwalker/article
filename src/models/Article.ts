@@ -3,7 +3,7 @@ import PlainArticle from "./PlainArticle"
 
 export default class Article extends ArticleMetadata {
   body: {
-    [key: string]: string;
+    [key: string]: string | string[];
   }[];
 
   constructor(plainArticle: PlainArticle){
