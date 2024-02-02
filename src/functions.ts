@@ -4,6 +4,12 @@ import PlainArticle from "./models/PlainArticle";
 import ArticleMetadata from "./models/ArticleMetadata";
 // import { ArticleNotFoundError, ArticleCatalogNotFoundError, ArticleCatalogUploadError, ArticleUploadError } from "./models/error";
 
+/**
+ * Convert a markdown file (in string type) to JSON type
+ * 
+ * @param file whole article itself in string type
+ * @returns 
+ */
 export const pharseMarkdown = (file: string) => {
   var handlingBody = false;
   var handlingPoetry = false;
@@ -131,12 +137,13 @@ export const rewriteArticleCatalog = (articleCatalog: ArticleCatalog, article: A
 
 }
 
+/**
+ * 
+ * @param articleCatalog 
+ * @param article 
+ * @returns return value -1 means article is not existed, else return index of the article in database. latest article is 0
+ */
 export const articleIsExisted = (articleCatalog: ArticleCatalog, article: Article): number => {
-  /* return value -1 means article is not existed
-   * else return index of the article in database
-   * latest article is 0
-   */ 
-
   for (var i = 0; i < articleCatalog["body"].length; i++) {
     if (articleCatalog["body"][i]["firstPublished"] == article["firstPublished"]) {
       return i;

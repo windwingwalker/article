@@ -8,7 +8,7 @@ import PlainArticle from "./models/PlainArticle";
 export const getArticleService = async (event): Promise<HTTPResponse> => {
   const firstPublished: string = event["queryStringParameters"]['firstPublished']
   const article: Article = await getArticleFromDB(firstPublished);
-  return new HTTPResponse(200, article)
+  return new HTTPResponse(200, article);
 }
 
 export const putArticleService = async (event): Promise<HTTPResponse> => {

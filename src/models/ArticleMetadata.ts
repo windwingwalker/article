@@ -2,12 +2,12 @@ export default class ArticleMetadata {
   firstPublished: number;
   lastModified: number;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   type: string;
   edition: number;
   views: number;
-  tags: string[];
-  series: string;
+  tags?: string[];
+  series?: string;
 
   constructor(
     firstPublished: number, 
