@@ -1,0 +1,8 @@
+# Heading Test Title
+- type: heading-test
+- firstPublished: 42
+---
+# First Level
+## Second Level
+### Third Level
+Heading test paragraph

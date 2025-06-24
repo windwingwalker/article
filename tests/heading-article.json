@@ -1,0 +1,11 @@
+{
+  "firstPublished": 42,
+  "title": "Heading Test Title",
+  "type": "heading-test",
+  "body": [
+    { "h1": "First Level" },
+    { "h2": "Second Level" },
+    { "h3": "Third Level" },
+    { "p": "Heading test paragraph" }
+  ]
+}
