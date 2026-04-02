@@ -60,12 +60,12 @@ jobs:
           TF_BACKEND_ACCESS_KEY: ${{ secrets.TF_BACKEND_ACCESS_KEY }}
           TF_BACKEND_SECRET_KEY: ${{ secrets.TF_BACKEND_SECRET_KEY }}
           TF_BACKEND_S3_ENDPOINT: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
+          AWS_ENDPOINT_URL_S3: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
         run: |
           terraform init \
             -input=false \
             -backend-config="../../../backend.r2.hcl" \
             -backend-config="key=article/pre-development/terraform.tfstate" \
-            -backend-config="endpoints.s3=${TF_BACKEND_S3_ENDPOINT}" \
             -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
             -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
 
@@ -99,6 +99,7 @@ jobs:
           TF_BACKEND_ACCESS_KEY: ${{ secrets.TF_BACKEND_ACCESS_KEY }}
           TF_BACKEND_SECRET_KEY: ${{ secrets.TF_BACKEND_SECRET_KEY }}
           TF_BACKEND_S3_ENDPOINT: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
+          AWS_ENDPOINT_URL_S3: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
           TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
           TF_VAR_image_tag: ${{ env.IMAGE_TAG }}
         run: |
@@ -106,7 +107,6 @@ jobs:
             -input=false \
             -backend-config="../../../backend.r2.hcl" \
             -backend-config="key=article/development/terraform.tfstate" \
-            -backend-config="endpoints.s3=${TF_BACKEND_S3_ENDPOINT}" \
             -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
             -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
 

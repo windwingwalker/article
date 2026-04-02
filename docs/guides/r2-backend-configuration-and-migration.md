@@ -97,6 +97,7 @@ Local operators and CI should provide:
 export TF_BACKEND_ACCESS_KEY="<access-key>"
 export TF_BACKEND_SECRET_KEY="<secret-key>"
 export TF_BACKEND_S3_ENDPOINT="<r2-s3-endpoint>"
+export AWS_ENDPOINT_URL_S3="${TF_BACKEND_S3_ENDPOINT}"
 ```
 
 Do not store these values in tracked files.
@@ -110,7 +111,6 @@ cd terraform/environments/pre-development
 terraform init \
   -backend-config="../../../backend.r2.hcl" \
   -backend-config="key=article/pre-development/terraform.tfstate" \
-  -backend-config="endpoints.s3=${TF_BACKEND_S3_ENDPOINT}" \
   -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
   -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
 ```
@@ -122,7 +122,6 @@ cd terraform/environments/development
 terraform init \
   -backend-config="../../../backend.r2.hcl" \
   -backend-config="key=article/development/terraform.tfstate" \
-  -backend-config="endpoints.s3=${TF_BACKEND_S3_ENDPOINT}" \
   -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
   -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
 ```
@@ -134,7 +133,6 @@ cd terraform/environments/production
 terraform init \
   -backend-config="../../../backend.r2.hcl" \
   -backend-config="key=article/production/terraform.tfstate" \
-  -backend-config="endpoints.s3=${TF_BACKEND_S3_ENDPOINT}" \
   -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
   -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
 ```
