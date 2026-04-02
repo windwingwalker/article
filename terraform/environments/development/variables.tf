@@ -9,6 +9,12 @@ variable "project_name" {
   type        = string
 }
 
+variable "aws_account_id" {
+  description = "AWS account ID used by modules that need account-scoped ARNs."
+  type        = string
+  default     = "730917489165"
+}
+
 variable "name_prefix" {
   description = "Prefix added to resource names for parallel stacks such as _tmp."
   type        = string

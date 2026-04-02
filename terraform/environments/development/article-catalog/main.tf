@@ -1,13 +1,10 @@
 module "eventbridge" {
-  source               = "../../../modules/eventbridge"
-  resource_name        = var.resource_name
-  function_arn         = var.function_arn
-  function_name        = var.function_name
-  description          = "Fires at 3am UTC+8 daily"
-  schedule_expression  = "cron(0 21 * * ? *)"
-  target_arn           = var.target_arn
-  target_function_name = var.target_function_name
-  target_qualifier     = var.target_qualifier
+  source              = "../../../modules/eventbridge"
+  resource_name       = var.resource_name
+  function_arn        = var.function_arn
+  function_name       = var.function_name
+  description         = "Fires at 3am UTC+8 daily"
+  schedule_expression = "cron(0 21 * * ? *)"
 }
 
 module "api-resource" {

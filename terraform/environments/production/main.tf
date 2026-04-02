@@ -2,7 +2,6 @@ module "api-gateway-stage" {
   source       = "../../modules/api-stage"
   project_name = local.stack_project_name
   stage_name   = "prod"
-  domain_name  = var.api_domain_name
 }
 
 data "aws_lambda_alias" "default" {

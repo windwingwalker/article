@@ -53,6 +53,7 @@ Articles are written in a custom markdown variant parsed by `pharseMarkdown` in 
 ### Terraform Workflow Note
 
 - If you change Terraform files, run `terraform fmt -recursive terraform` before pushing. The GitHub Actions Terraform matrix runs `terraform fmt -check`, so unformatted `.tf` files will fail all Terraform validation jobs.
+- Keep Terraform module interfaces in sync with the environment roots and nested environment modules. This repo has shared modules under `terraform/modules/` and callers under `terraform/environments/`; if a shared module input changes, update all callers in the same change or CI will fail on `terraform validate` with missing or unsupported argument errors.
 
 ## Test Structure
 

@@ -1,14 +1,13 @@
 module "api-gateway" {
-  source                = "../../modules/api-gateway"
-  project_name          = local.stack_project_name
-  cognito_user_pool_arn = var.cognito_user_pool_arn
+  source         = "../../modules/api-gateway"
+  project_name   = local.stack_project_name
+  aws_account_id = var.aws_account_id
 }
 
 module "api-gateway-stage" {
   source       = "../../modules/api-stage"
   project_name = local.stack_project_name
   stage_name   = "dev"
-  domain_name  = var.api_domain_name
   depends_on = [
     module.article,
     module.article-catalog,
@@ -20,7 +19,6 @@ module "lambda" {
   source         = "../../modules/lambda/"
   resource_name  = local.function_name
   image_tag      = var.image_tag
-  architecture   = var.lambda_architecture
   lambda_env_var = null
   depends_on = [
     module.api-gateway
