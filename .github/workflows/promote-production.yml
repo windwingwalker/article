@@ -47,7 +47,6 @@ jobs:
           TF_BACKEND_ACCESS_KEY: ${{ secrets.TF_BACKEND_ACCESS_KEY }}
           TF_BACKEND_SECRET_KEY: ${{ secrets.TF_BACKEND_SECRET_KEY }}
           TF_BACKEND_S3_ENDPOINT: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
-          AWS_ENDPOINT_URL_S3: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
         run: |
           terraform init \
             -input=false \
