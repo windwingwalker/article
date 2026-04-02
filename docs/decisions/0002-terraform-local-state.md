@@ -1,4 +1,4 @@
-# Design Decision: Use Local Terraform State
+# Terraform Remote State And Workflow-Only Execution
 
 ## Status
 
@@ -6,35 +6,41 @@ Accepted
 
 ## Context
 
-This project is a small personal project with low traffic and a strong preference for minimizing cost and operational overhead.
+The repository previously used local Terraform state and tolerated local operator-driven Terraform workflows.
 
-Remote Terraform state storage, such as S3-based backends or Terraform Cloud, adds infrastructure cost and complexity that is not justified for the current scale of the project.
+That approach was simpler at first, but it made state handling more fragile and made CI/CD behavior less reliable.
+
+The project now relies on GitHub workflows to validate and apply Terraform changes. State is stored remotely in Cloudflare R2 instead of the local environment.
 
 ## Decision
 
-Terraform state will be stored locally only.
+Terraform state will be stored remotely in Cloudflare R2.
 
-In practice, this means:
+Terraform changes should not be applied locally as part of normal development workflow.
 
-- commit `.terraform.lock.hcl`
-- do not commit `terraform.tfstate`
-- do not use remote backend storage
-- keep Terraform state files only on the local machine
+Instead:
+
+- Terraform validation and deployment should go through GitHub workflows
+- remote state is the source of truth
+- local Terraform state should not be treated as the operational system of record
 
 ## Consequences
 
 Positive consequences:
 
-- no additional cost for remote state storage
-- simpler Terraform workflow
-- fewer AWS resources to manage
+- more reliable and consistent Terraform execution
+- shared state for CI/CD instead of machine-local state
+- reduced risk of drift between local operator actions and automated workflows
+- easier promotion and deployment through GitHub Actions
 
 Negative consequences:
 
-- state is more fragile during laptop migration or disk loss
-- no remote locking
-- recovery may require manual import if local state is lost
+- slower iteration compared with unrestricted local Terraform workflows
+- more setup and operational dependency on GitHub Actions and remote backend availability
+- more friction for quick local experimentation
 
 ## Notes
 
-This decision matches the current priorities of the project: low cost, low operational complexity, and tolerance for downtime and recovery work.
+This is an intentional tradeoff.
+
+The project is sacrificing some development speed in exchange for more reliable infrastructure delivery and more consistent release behavior.
