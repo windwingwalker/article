@@ -1,6 +1,9 @@
 name: Promote Production
 
 on:
+  push:
+    branches:
+      - release
   workflow_dispatch:
     inputs:
       source_stage_name:
@@ -10,7 +13,7 @@ on:
         default: dev
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 concurrency:
@@ -21,6 +24,7 @@ env:
   AWS_REGION: us-east-1
   TF_VAR_project_name: article
   TF_IN_AUTOMATION: true
+  TF_VAR_source_stage_name: ${{ github.event_name == 'workflow_dispatch' && inputs.source_stage_name || 'dev' }}
 
 jobs:
   promote:
@@ -31,6 +35,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -60,12 +66,40 @@ jobs:
         working-directory: terraform/environments/production
         env:
           TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
-          TF_VAR_source_stage_name: ${{ inputs.source_stage_name }}
+          TF_VAR_source_stage_name: ${{ env.TF_VAR_source_stage_name }}
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply Production
         working-directory: terraform/environments/production
         env:
           TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
-          TF_VAR_source_stage_name: ${{ inputs.source_stage_name }}
+          TF_VAR_source_stage_name: ${{ env.TF_VAR_source_stage_name }}
         run: terraform apply -input=false -auto-approve tfplan
+
+      - name: Calculate Next Release Tag
+        id: next_tag
+        run: |
+          git fetch --tags --force
+
+          LAST_TAG="$(git tag --list 'v*' --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)"
+
+          if [ -z "${LAST_TAG}" ]; then
+            NEXT_TAG="v0.1.0"
+          else
+            VERSION="${LAST_TAG#v}"
+            MAJOR="${VERSION%%.*}"
+            REST="${VERSION#*.}"
+            MINOR="${REST%%.*}"
+            NEXT_MINOR=$((MINOR + 1))
+            NEXT_TAG="v${MAJOR}.${NEXT_MINOR}.0"
+          fi
+
+          echo "last_tag=${LAST_TAG}" >> "${GITHUB_OUTPUT}"
+          echo "next_tag=${NEXT_TAG}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create And Push Release Tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.next_tag.outputs.next_tag }}" -m "Release ${{ steps.next_tag.outputs.next_tag }}" "${GITHUB_SHA}"
+          git push origin "${{ steps.next_tag.outputs.next_tag }}"

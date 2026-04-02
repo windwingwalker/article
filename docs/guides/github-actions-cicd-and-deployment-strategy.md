@@ -35,8 +35,8 @@ Replace Jenkins with GitHub-native CI/CD while keeping production promotion expl
   - source of truth for the next `development` deployment
   - merge to `main` triggers build, image publish, and `development` apply
 - Production:
-  - promoted explicitly from a previously tested artifact
-  - deployment is triggered manually through GitHub Actions `workflow_dispatch`
+  - promoted from the tested `dev` alias through the `release` branch flow
+  - deployment is triggered by pushes to `release`
   - protected by GitHub Environment approval
 
 ## Required GitHub Configuration
@@ -164,14 +164,15 @@ These outputs should be written to workflow outputs, artifacts, or another expli
 
 Trigger:
 
-- manual `workflow_dispatch`
+- push to `release`
+- optional manual `workflow_dispatch`
 
 Inputs:
 
-- current implementation input:
-  - `source_stage_name`
-- current default:
+- current source alias:
   - `dev`
+- manual override input:
+  - `source_stage_name`
 
 Responsibilities:
 
@@ -179,12 +180,14 @@ Responsibilities:
 - run `terraform plan` for `terraform/environments/production`
 - surface the plan for review
 - apply only after approval
+- create a release tag after successful promotion by incrementing the latest `v<major>.<minor>.<patch>` tag to the next minor version
 
 Current limitation:
 
 - the present production Terraform root promotes from a source Lambda alias, not from an explicit image digest or Lambda version
 - that means the current workflow promotes whatever version the selected alias points to at promotion time
 - explicit artifact promotion remains the target design, but it is not yet implemented in this repository
+- the current automated release tag rule bumps minor and resets patch to zero, for example `v1.0.0` -> `v1.1.0`
 
 ## Workflow Runtime Inputs
 
@@ -225,17 +228,7 @@ Keep these roots independently plannable and applicable.
 
 Production must stay explicit.
 
-Approved strategies:
-
-- pass a tested Lambda version into the production root
-- pass a tested image digest into the production root if the production alias resolves from that deployment path
-- record the approved promotion target in a release artifact or manifest
-
-Disallowed strategy:
-
-- automatically promote whatever was most recently deployed to development
-
-This follows the direction already captured in [`0001-cicd-driven-production-promotion.md`](/Users/windwingwalker/Vault/Code/my-code/article/docs/future-improvements/0001-cicd-driven-production-promotion.md).
+This repository intentionally accepts alias-based promotion for now. See [`0003-production-promotion-follows-dev-alias.md`](/Users/windwingwalker/Vault/Code/my-code/article/docs/decisions/0003-production-promotion-follows-dev-alias.md).
 
 ## Operational Guardrails
 
