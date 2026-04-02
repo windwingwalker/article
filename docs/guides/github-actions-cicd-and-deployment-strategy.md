@@ -143,7 +143,7 @@ Trigger:
 Responsibilities:
 
 - build application
-- apply `terraform/environments/pre-development`
+- apply `terraform/environments/pre-development` only when bootstrap-related files change
 - build Docker image
 - push image to ECR
 - run `terraform plan` and `terraform apply tfplan` for the development roots
