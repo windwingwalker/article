@@ -74,6 +74,7 @@ It contains:
 
 - bucket name
 - region placeholder
+- path-style setting for R2 compatibility
 - R2 compatibility flags
 
 It does not contain:
@@ -111,6 +112,7 @@ cd terraform/environments/pre-development
 terraform init \
   -backend-config="../../../backend.r2.hcl" \
   -backend-config="key=article/pre-development/terraform.tfstate" \
+  -backend-config="endpoint=${TF_BACKEND_S3_ENDPOINT}" \
   -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
   -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
 ```
@@ -122,6 +124,7 @@ cd terraform/environments/development
 terraform init \
   -backend-config="../../../backend.r2.hcl" \
   -backend-config="key=article/development/terraform.tfstate" \
+  -backend-config="endpoint=${TF_BACKEND_S3_ENDPOINT}" \
   -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
   -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
 ```
@@ -133,6 +136,7 @@ cd terraform/environments/production
 terraform init \
   -backend-config="../../../backend.r2.hcl" \
   -backend-config="key=article/production/terraform.tfstate" \
+  -backend-config="endpoint=${TF_BACKEND_S3_ENDPOINT}" \
   -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
   -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
 ```

@@ -53,6 +53,7 @@ jobs:
             -input=false \
             -backend-config="../../../backend.r2.hcl" \
             -backend-config="key=article/production/terraform.tfstate" \
+            -backend-config="endpoint=${TF_BACKEND_S3_ENDPOINT}" \
             -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
             -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
 
