@@ -1,11 +1,11 @@
 module "api-resource" {
-  source = "../../modules/api-resource/"
+  source = "../../../modules/api-resource/"
   project_name = var.project_name
   resource_name = var.resource_name
 }
 
 module "api-put" {
-  source = "../../modules/api-route/"
+  source = "../../../modules/api-route/"
   aws_region = var.aws_region
   project_name = var.project_name
   resource_name = var.resource_name
@@ -19,7 +19,7 @@ module "api-put" {
 }
 
 module "api-get" {
-  source = "../../modules/api-route/"
+  source = "../../../modules/api-route/"
   aws_region = var.aws_region
   project_name = var.project_name
   resource_name = var.resource_name
