@@ -50,6 +50,10 @@ Articles are written in a custom markdown variant parsed by `pharseMarkdown` in 
 - **Jenkinsfile** - CI/CD pipeline: build code -> build Docker image -> push to ECR
 - **Dockerfile** - Based on `public.ecr.aws/lambda/nodejs:18`, copies compiled `dist/` into Lambda runtime
 
+### Terraform Workflow Note
+
+- If you change Terraform files, run `terraform fmt -recursive terraform` before pushing. The GitHub Actions Terraform matrix runs `terraform fmt -check`, so unformatted `.tf` files will fail all Terraform validation jobs.
+
 ## Test Structure
 
 Tests live in `tests/` using mocha + chai. Test fixtures are `.txt` (markdown input) and `.json` (expected parsed output) file pairs. Tests currently cover `pharseMarkdown` only. Tests must be run from the project root (fixtures use relative paths like `./tests/valid-article.txt`).

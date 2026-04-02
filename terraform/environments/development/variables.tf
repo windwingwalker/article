@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region for all resources."
-  type    = string
-  default = "us-east-1"
+  type        = string
+  default     = "us-east-1"
 }
 
 variable "project_name" {
@@ -11,8 +11,8 @@ variable "project_name" {
 
 variable "name_prefix" {
   description = "Prefix added to resource names for parallel stacks such as _tmp."
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
 }
 
 variable "image_tag" {
@@ -28,12 +28,12 @@ variable "lambda_architecture" {
 
 variable "cognito_user_pool_arn" {
   description = "Shared Cognito user pool ARN used by the API Gateway authorizer."
-  type    = string
-  default = "arn:aws:cognito-idp:us-east-1:730917489165:userpool/us-east-1_Nm3Y2dwMj"
+  type        = string
+  default     = "arn:aws:cognito-idp:us-east-1:730917489165:userpool/us-east-1_Nm3Y2dwMj"
 }
 
 variable "api_domain_name" {
   description = "Shared custom domain name used for API Gateway base path mappings."
-  type    = string
-  default = "api.windwingwalker.xyz"
+  type        = string
+  default     = "api.windwingwalker.xyz"
 }

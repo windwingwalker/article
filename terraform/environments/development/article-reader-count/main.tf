@@ -1,16 +1,16 @@
 module "api-resource" {
-  source = "../../../modules/api-resource/"
-  project_name = var.project_name
+  source        = "../../../modules/api-resource/"
+  project_name  = var.project_name
   resource_name = var.api_resource_name
 }
 
 module "api-post" {
-  source = "../../../modules/api-route/"
-  aws_region = var.aws_region
-  project_name = var.project_name
+  source        = "../../../modules/api-route/"
+  aws_region    = var.aws_region
+  project_name  = var.project_name
   resource_name = var.api_resource_name
-  function_arn = var.function_arn
-  http_method = "POST"
+  function_arn  = var.function_arn
+  http_method   = "POST"
   authorizer_id = null
   authorization = "NONE"
   depends_on = [
@@ -18,8 +18,8 @@ module "api-post" {
   ]
 }
 
-module "sqs"{
-  source = "../../../modules/sqs/"
+module "sqs" {
+  source        = "../../../modules/sqs/"
   resource_name = var.resource_name
 }
 

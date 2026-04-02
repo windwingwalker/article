@@ -1,4 +1,4 @@
-resource "aws_api_gateway_rest_api" "default"{
+resource "aws_api_gateway_rest_api" "default" {
   name = "${var.project_name}-gateway"
 }
 

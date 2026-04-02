@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region for all resources."
-  type    = string
-  default = "us-east-1"
+  type        = string
+  default     = "us-east-1"
 }
 
 variable "project_name" {
@@ -11,6 +11,6 @@ variable "project_name" {
 
 variable "name_prefix" {
   description = "Prefix added to resource names for parallel stacks such as _tmp."
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
 }
