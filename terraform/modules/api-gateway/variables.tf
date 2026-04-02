@@ -1,5 +1,5 @@
 variable "project_name" {
-  type = string 
+  type = string
 }
 
 variable "aws_account_id" {

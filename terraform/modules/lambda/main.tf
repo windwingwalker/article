@@ -12,14 +12,14 @@ data "aws_ecr_repository" "default" {
 
 resource "aws_lambda_function" "default" {
   # Neccessary
-  function_name        = "${var.resource_name}"
-  package_type         = "Image"
-  image_uri            = "${data.aws_ecr_repository.default.repository_url}:${var.image_tag}"
+  function_name = var.resource_name
+  package_type  = "Image"
+  image_uri     = "${data.aws_ecr_repository.default.repository_url}:${var.image_tag}"
 
-  role                 = data.aws_iam_role.default.arn
-  publish              = true
-  timeout              = var.timeout
-  
+  role    = data.aws_iam_role.default.arn
+  publish = true
+  timeout = var.timeout
+
   # Optional
   dynamic "environment" {
     for_each = local.environment_map

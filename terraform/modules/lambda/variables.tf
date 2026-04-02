@@ -1,5 +1,5 @@
 variable "resource_name" {
-  type = string 
+  type = string
 }
 
 variable "image_tag" {
@@ -7,15 +7,15 @@ variable "image_tag" {
 }
 
 variable "lambda_env_var" {
-  type = map
+  type = map(any)
 }
 
 variable "timeout" {
-  type = number
+  type    = number
   default = 900
 }
 
 variable "log_retention_in_days" {
-  type = number
+  type    = number
   default = 30
 }

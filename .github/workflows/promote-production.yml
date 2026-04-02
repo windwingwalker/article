@@ -1,0 +1,71 @@
+name: Promote Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_stage_name:
+        description: Alias name to promote from
+        required: true
+        type: string
+        default: dev
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: promote-production
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  TF_VAR_project_name: article
+  TF_IN_AUTOMATION: true
+
+jobs:
+  promote:
+    name: Promote Production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN_PRODUCTION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init Production
+        working-directory: terraform/environments/production
+        env:
+          TF_BACKEND_ACCESS_KEY: ${{ secrets.TF_BACKEND_ACCESS_KEY }}
+          TF_BACKEND_SECRET_KEY: ${{ secrets.TF_BACKEND_SECRET_KEY }}
+          TF_BACKEND_S3_ENDPOINT: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
+        run: |
+          terraform init \
+            -input=false \
+            -backend-config="../../../backend.r2.hcl" \
+            -backend-config="key=article/production/terraform.tfstate" \
+            -backend-config="endpoints.s3=${TF_BACKEND_S3_ENDPOINT}" \
+            -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
+            -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
+
+      - name: Terraform Plan Production
+        working-directory: terraform/environments/production
+        env:
+          TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
+          TF_VAR_source_stage_name: ${{ inputs.source_stage_name }}
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply Production
+        working-directory: terraform/environments/production
+        env:
+          TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
+          TF_VAR_source_stage_name: ${{ inputs.source_stage_name }}
+        run: terraform apply -input=false -auto-approve tfplan

@@ -1,9 +1,9 @@
 variable "project_name" {
-  type = string 
+  type = string
 }
 
 variable "resource_name" {
-  type = string 
+  type = string
 }
 
 variable "aws_region" {
@@ -14,7 +14,7 @@ variable "aws_region" {
 }
 
 variable "function_arn" {
-  type    = string
+  type = string
 }
 
 variable "http_method" {

@@ -41,15 +41,15 @@ resource "aws_api_gateway_stage" "default" {
   #   aws_cloudwatch_log_group.default,
   # ]
 
-  rest_api_id = data.aws_api_gateway_rest_api.default.id
+  rest_api_id   = data.aws_api_gateway_rest_api.default.id
   deployment_id = aws_api_gateway_deployment.default.id
-  stage_name = var.stage_name
+  stage_name    = var.stage_name
   variables = {
     alias = var.stage_name
   }
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.default.arn
-    format = "{ \"requestId\":\"$context.requestId\", \"ip\": \"$context.identity.sourceIp\", \"caller\":\"$context.identity.caller\", \"user\":\"$context.identity.user\",\"requestTime\":\"$context.requestTime\", \"httpMethod\":\"$context.httpMethod\",\"resourcePath\":\"$context.resourcePath\", \"status\":\"$context.status\",\"protocol\":\"$context.protocol\", \"responseLength\":\"$context.responseLength\" }"
+    format          = "{ \"requestId\":\"$context.requestId\", \"ip\": \"$context.identity.sourceIp\", \"caller\":\"$context.identity.caller\", \"user\":\"$context.identity.user\",\"requestTime\":\"$context.requestTime\", \"httpMethod\":\"$context.httpMethod\",\"resourcePath\":\"$context.resourcePath\", \"status\":\"$context.status\",\"protocol\":\"$context.protocol\", \"responseLength\":\"$context.responseLength\" }"
   }
 
   lifecycle {
@@ -65,9 +65,9 @@ resource "aws_api_gateway_method_settings" "default" {
   method_path = "*/*"
 
   settings {
-    metrics_enabled        = true
-    data_trace_enabled     = false
-    logging_level          = "INFO"
+    metrics_enabled    = true
+    data_trace_enabled = false
+    logging_level      = "INFO"
 
     # Limit the rate of calls to prevent abuse and unwanted charges
     throttling_rate_limit  = 100
@@ -84,7 +84,7 @@ resource "aws_api_gateway_base_path_mapping" "default" {
   api_id      = data.aws_api_gateway_rest_api.default.id
   stage_name  = aws_api_gateway_stage.default.stage_name
   domain_name = "api.windwingwalker.xyz"
-  base_path = var.stage_name == "dev" ? "dev-${var.project_name}" : "${var.project_name}"
+  base_path   = var.stage_name == "dev" ? "dev-${var.project_name}" : "${var.project_name}"
   depends_on = [
     aws_api_gateway_deployment.default,
   ]

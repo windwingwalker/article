@@ -14,8 +14,8 @@ resource "aws_lambda_permission" "api_gw" {
   function_name = var.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn    = "${data.aws_api_gateway_rest_api.default.execution_arn}/*/*"
-  qualifier      = var.stage_name
+  source_arn = "${data.aws_api_gateway_rest_api.default.execution_arn}/*/*"
+  qualifier  = var.stage_name
   lifecycle {
     ignore_changes = [
       source_arn

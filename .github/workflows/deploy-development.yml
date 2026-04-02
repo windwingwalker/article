@@ -1,0 +1,122 @@
+name: Deploy Development
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-development
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  TF_VAR_project_name: article
+  ECR_REPOSITORY: article
+  IMAGE_TAG: ${{ github.sha }}
+  TF_IN_AUTOMATION: true
+
+jobs:
+  deploy:
+    name: Deploy Development
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN_DEVELOPMENT }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init Pre-Development
+        working-directory: terraform/environments/pre-development
+        env:
+          TF_BACKEND_ACCESS_KEY: ${{ secrets.TF_BACKEND_ACCESS_KEY }}
+          TF_BACKEND_SECRET_KEY: ${{ secrets.TF_BACKEND_SECRET_KEY }}
+          TF_BACKEND_S3_ENDPOINT: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
+        run: |
+          terraform init \
+            -input=false \
+            -backend-config="../../../backend.r2.hcl" \
+            -backend-config="key=article/pre-development/terraform.tfstate" \
+            -backend-config="endpoints.s3=${TF_BACKEND_S3_ENDPOINT}" \
+            -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
+            -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
+
+      - name: Terraform Plan Pre-Development
+        working-directory: terraform/environments/pre-development
+        env:
+          TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply Pre-Development
+        working-directory: terraform/environments/pre-development
+        run: terraform apply -input=false -auto-approve tfplan
+
+      - name: Login To Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build And Push Image
+        id: image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          docker build -t "${IMAGE_URI}" .
+          docker push "${IMAGE_URI}"
+          echo "image_uri=${IMAGE_URI}" >> "${GITHUB_OUTPUT}"
+
+      - name: Terraform Init Development
+        working-directory: terraform/environments/development
+        env:
+          TF_BACKEND_ACCESS_KEY: ${{ secrets.TF_BACKEND_ACCESS_KEY }}
+          TF_BACKEND_SECRET_KEY: ${{ secrets.TF_BACKEND_SECRET_KEY }}
+          TF_BACKEND_S3_ENDPOINT: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
+          TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
+          TF_VAR_image_tag: ${{ env.IMAGE_TAG }}
+        run: |
+          terraform init \
+            -input=false \
+            -backend-config="../../../backend.r2.hcl" \
+            -backend-config="key=article/development/terraform.tfstate" \
+            -backend-config="endpoints.s3=${TF_BACKEND_S3_ENDPOINT}" \
+            -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
+            -backend-config="secret_key=${TF_BACKEND_SECRET_KEY}"
+
+      - name: Terraform Plan Development
+        working-directory: terraform/environments/development
+        env:
+          TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
+          TF_VAR_image_tag: ${{ env.IMAGE_TAG }}
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply Development
+        working-directory: terraform/environments/development
+        run: terraform apply -input=false -auto-approve tfplan

@@ -1,5 +1,5 @@
 variable "project_name" {
-  type = string 
+  type = string
 }
 
 variable "resource_name" {
