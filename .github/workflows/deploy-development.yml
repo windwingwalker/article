@@ -1,7 +1,11 @@
 name: Deploy Development
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
     branches:
       - develop
   workflow_dispatch:
@@ -18,7 +22,7 @@ env:
   AWS_REGION: us-east-1
   TF_VAR_project_name: article
   ECR_REPOSITORY: article
-  IMAGE_TAG: ${{ github.sha }}
+  IMAGE_TAG: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
   TF_IN_AUTOMATION: true
 
 jobs:
@@ -26,10 +30,13 @@ jobs:
     name: Deploy Development
     runs-on: ubuntu-latest
     environment: development
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -39,9 +46,6 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-
-      - name: Run Tests
-        run: npm test
 
       - name: Build
         run: npm run build

@@ -47,7 +47,7 @@ Example shape for a new repository:
 
 - **Build:** `npm run build` (compiles TypeScript to `dist/` via `tsc`)
 - **Test:** `npm test` (runs mocha + chai tests via `mocha --require ts-node/register tests/**/*.ts --exit`)
-- **Dev:** `npm start` (runs `nodemon src/controller.ts` for local development)
+- **Dev:** `npm start` (runs `nodemon src/index.ts` for local development)
 - **Local Node Version:** `.nvmrc` targets Node.js `24`
 
 ## Architecture
@@ -56,9 +56,9 @@ This is a **serverless backend application** for a personal blog (`windwingwalke
 
 ### Request Flow
 
-`Lambda Event -> controller.ts (router) -> services.ts (business logic) -> io.ts (AWS SDK calls)`
+`Lambda Event -> index.ts (router) -> services.ts (business logic) -> io.ts (AWS SDK calls)`
 
-1. **controller.ts** - Single Lambda entry point (`lambdaHandler`). Routes based on event source (`api-get`, `api-put`, `api-post`, `sqs`, `cron`) and API resource path (`/article`, `/article-catalog`).
+1. **index.ts** - Single Lambda entry point (`lambdaHandler`). Routes based on event source (`api-get`, `api-put`, `api-post`, `sqs`, `cron`) and API resource path (`/article`, `/article-catalog`).
 2. **functions.ts** - Pure utility functions: `pharseMarkdown` (parses custom markdown format into structured JSON), `getLambdaEventSource` (detects Lambda trigger type), `articleIsExisted`, `rewriteArticleCatalog`, `rewriteArticle`.
 3. **services.ts** - Service layer orchestrating business logic for each operation (get/put article, get/put catalog, reader count tracking, scheduled catalog sync).
 4. **io.ts** - Data access layer wrapping AWS SDK clients (DynamoDB, SQS, SSM). Region is hardcoded to `us-east-1`.

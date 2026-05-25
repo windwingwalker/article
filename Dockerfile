@@ -7,4 +7,4 @@ COPY node_modules/ ./
 
 COPY dist/ ./
 
-CMD [ "src/controller.lambdaHandler" ]
+CMD [ "src/index.lambdaHandler" ]

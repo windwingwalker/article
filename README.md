@@ -37,7 +37,7 @@ The root `README.md` is the primary documentation map. Each section folder in `d
 ## Runtime
 
 - Node target: `24`
-- Lambda model: one entrypoint in `src/controller.ts`
+- Lambda model: one entrypoint in `src/index.ts`
 - Request flow: Lambda event -> router -> services -> storage or queue adapter
 
 

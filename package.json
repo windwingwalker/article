@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "Node.js on Docker",
   "author": "windwingwalker",
-  "main": "src/controller.js",
+  "main": "src/index.js",
   "engines": {
     "node": "24.x"
   },
   "scripts": {
-    "start": "nodemon src/controller.ts",
+    "start": "nodemon src/index.ts",
     "local": "ts-node src/local.ts",
     "check:r2": "ts-node src/checkR2.ts",
     "check:r2-api": "ts-node src/checkCloudflareR2Api.ts",

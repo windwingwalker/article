@@ -12,9 +12,9 @@ That approach provides tighter release control, but it also adds release bookkee
 
 This repository now uses a branch-based release flow:
 
-- changes are deployed to development from `main`
+- changes are deployed to development from `develop`
 - development is tested before promotion
-- a push to `release` triggers production promotion
+- a push to `production` triggers production promotion
 
 ## Decision
 
@@ -24,12 +24,12 @@ Instead, production reads the live Lambda version behind the `dev` alias at prom
 
 This is intentional.
 
-The goal is to keep production close to development while still requiring an explicit release action through the `release` branch.
+The goal is to keep production close to development while still requiring an explicit release action through the `production` branch.
 
 The operating assumption is:
 
 - every change deployed to development is tested before promotion
-- pushing to `release` means the current development version is considered ready for production
+- pushing to `production` means the current development version is considered ready for production
 
 For this application, that tradeoff is acceptable because the system is small and the overhead of precise version capture is not justified right now.
 

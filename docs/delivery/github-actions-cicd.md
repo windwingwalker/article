@@ -8,8 +8,8 @@ The goal is to replace Jenkins with GitHub Actions while keeping production prom
 
 ## What delivery model does this repository want?
 
-- Pull requests into `main` should validate only.
-- Pushes to `main` should deploy development automatically.
+- Pull requests into `develop` should validate only.
+- Pushes to `develop` should run CI, then deploy development automatically after CI succeeds.
 - Production promotion should stay explicit and approval-gated.
 - AWS access should use GitHub OIDC instead of long-lived access keys.
 - Deployment artifacts should be immutable.
@@ -25,11 +25,11 @@ The goal is to replace Jenkins with GitHub Actions while keeping production prom
 
 ## What branch and promotion flow is intended?
 
-- Feature branches open pull requests into `main`.
+- Feature branches open pull requests into `develop`.
 - Pull requests run validation only.
-- `main` is the source of truth for development deployment.
-- Pushes to `main` trigger build, image publish, and development apply.
-- Pushes to `release`, or an approved manual production workflow, promote production.
+- `develop` is the source of truth for development deployment.
+- Pushes to `develop` trigger CI; a successful CI run triggers image publish and development apply.
+- Pushes to `production`, or an approved manual production workflow, promote production.
 
 This repository currently accepts alias-based production promotion. Production reads the version currently behind the selected source alias instead of promoting a version-pinned artifact. See [decision-production-follows-dev-alias.md](/Users/windwingwalker/Vault/Code/my-code/article/docs/delivery/decision-production-follows-dev-alias.md).
 
@@ -37,7 +37,8 @@ This repository currently accepts alias-based production promotion. Production r
 
 ### What branch protection is expected?
 
-- Protect `main`.
+- Protect `develop`.
+- Protect `production`.
 - Require pull request review.
 - Require required status checks before merge.
 - Restrict direct pushes when practical.
@@ -109,7 +110,9 @@ The intended workflow set is:
 
 Trigger:
 
-- pull requests targeting `main`
+- pushes and pull requests targeting `develop`
+- pushes and pull requests targeting `production`
+- manual `workflow_dispatch`
 
 Responsibilities:
 
@@ -129,7 +132,8 @@ Expected outcome:
 
 Trigger:
 
-- push to `main`
+- successful `CI` workflow completion on `develop`
+- manual `workflow_dispatch`
 
 Responsibilities:
 
@@ -152,13 +156,8 @@ Deployment metadata should include:
 
 Trigger:
 
-- push to `release`
+- push to `production`
 - optional `workflow_dispatch`
-
-Inputs:
-
-- source alias, defaulting to `dev`
-- optional manual override such as `source_stage_name`
 
 Responsibilities:
 
@@ -213,7 +212,7 @@ Keep each root independently plannable and applicable.
 - no long-lived AWS access keys in GitHub Actions
 - no mutable deployment references
 - no production apply from pull request workflows
-- no automatic production promotion on merge to `main`
+- no automatic production promotion on merge to `develop`
 - no backend bootstrap changes inside normal application deploy workflows
 
 ## In what order should this be implemented?

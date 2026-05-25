@@ -2,11 +2,11 @@
 
 ## How does the application process work?
 
-The runtime flow is `Lambda Event -> controller.ts -> services.ts -> storage or queue adapter`.
+The runtime flow is `Lambda Event -> index.ts -> services.ts -> storage or queue adapter`.
 
 ## What are the main architectural boundaries?
 
-- Router and event dispatch in `src/controller.ts`
+- Router and event dispatch in `src/index.ts`
 - Business logic orchestration in `src/services.ts`
 - Storage selection in `src/articleStore.ts`
 - DynamoDB-backed article and catalog access in `src/dynamoArticleStore.ts`

@@ -19,7 +19,7 @@ The frontend calls `POST /article-reader-count?firstPublished=...`. The API writ
 
 ## Where is interface routing defined?
 
-- Runtime routing starts in `src/controller.ts`
+- Runtime routing starts in `src/index.ts`
 - Event source classification is handled by `getLambdaEventSource` in `src/functions.ts`
 
 ## What should be read next?

@@ -1,9 +1,15 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - develop
+      - production
   pull_request:
     branches:
-      - main
+      - develop
+      - production
+  workflow_dispatch:
 
 permissions:
   contents: read
