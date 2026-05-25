@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { lambdaHandler } from "./controller";
+import { lambdaHandler } from "./index";
 import { loadLocalEnv } from "./loadLocalEnv";
 
 loadLocalEnv();
