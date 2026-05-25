@@ -2,15 +2,53 @@
 
 This file provides guidance to coding agents working with code in this repository.
 
-## Documentation Rule
+## Documentation Methodology
 
-- Every document in this repository must be linked from `README.md`.
+- Use a question-based documentation structure under `docs/`.
+- Treat the root `README.md` as the primary documentation map for the repository.
+- Keep the root `README.md` lightweight; it should route readers to section indexes rather than hold all details itself.
+- Treat each top-level section in `docs/` as a knowledge domain with its own `README.md`.
+- Use section `README.md` files as Q&A indexes that direct readers to leaf documents.
+- In documentation, make every heading question-oriented by default. `#` may be a title when needed, but section headings should be written as questions.
+- Do not create `docs/README.md`; the root `README.md` is the only top-level documentation map.
+- Do not create `docs/decisions/`; put decision files in the section folder they actually govern.
+- Keep leaf markdown files small, single-purpose, and self-contained.
+- Prefer short, distinct folder and file names.
+- When a topic grows too broad, split it into multiple leaf documents instead of expanding one long file.
+- Link new leaf docs from the relevant section `README.md`, and keep the root `README.md` updated with the top-level section map.
+- When a document captures a durable tradeoff or ADR, colocate it with the owning domain and use a clear name such as `decision-<topic>.md`.
+- For cross-repository reuse, prefer the global skill `question-docs-pattern` instead of adding a repo-local copy.
+- When summarizing work to the user, prefer question-led sections as well. Lead with questions such as `What changed?`, `What remains?`, and `What did not run?` instead of neutral labels.
+- When creating docs in other repositories, reuse the same pattern unless that repository has a stronger local convention.
+
+### Recommended Section Pattern
+
+- `docs/overview/`: purpose, scope, users, critical workflows
+- `docs/architecture/`: runtime flow, dependencies, boundaries
+- `docs/data/`: entities, storage, schemas, source of truth
+- `docs/interfaces/`: APIs, events, inputs, outputs
+- `docs/dev/`: local workflow, testing, configuration, quality
+- `docs/delivery/`: build, CI/CD, environments, promotion
+- `docs/ops/`: runbooks, recovery, incidents, failure modes, operating tradeoffs
+- `docs/roadmap/`: deferred improvements and planned changes
+
+### Concise Example
+
+Example shape for a new repository:
+
+- `docs/architecture/README.md`
+  - Q: How does request processing work?
+  - A: Short summary plus links to `request-flow.md` and `system-boundaries.md`
+- `docs/delivery/README.md`
+  - Q: How is production deployed?
+  - A: Short summary plus links to `deployment-flow.md` and `rollback.md`
 
 ## Commands
 
 - **Build:** `npm run build` (compiles TypeScript to `dist/` via `tsc`)
 - **Test:** `npm test` (runs mocha + chai tests via `mocha --require ts-node/register tests/**/*.ts --exit`)
 - **Dev:** `npm start` (runs `nodemon src/controller.ts` for local development)
+- **Local Node Version:** `.nvmrc` targets Node.js `24`
 
 ## Architecture
 
@@ -47,8 +85,20 @@ Articles are written in a custom markdown variant parsed by `pharseMarkdown` in 
 - **terraform/environments/development/** - Development Terraform root
 - **terraform/environments/pre-development/** - Bootstrap/shared Terraform root
 - **terraform/environments/production/** - Production Terraform root
-- **Jenkinsfile** - CI/CD pipeline: build code -> build Docker image -> push to ECR
-- **Dockerfile** - Based on `public.ecr.aws/lambda/nodejs:18`, copies compiled `dist/` into Lambda runtime
+- **Dockerfile** - Based on `public.ecr.aws/lambda/nodejs:24`, copies compiled `dist/` into Lambda runtime
+
+### Environment Ownership
+
+- **pre-development** - Owns shared foundation resources for this application, currently the resource group and ECR repository
+- **development** - Owns the mutable application stack, including the REST API, Lambda function, `dev` alias, API routes, EventBridge schedule, and SQS reader-count processing
+- **production** - Owns production-facing promotion targets only, primarily the `prod` API stage and `prod` Lambda alias
+
+### Isolation Model
+
+- Development and production are separated at the API Gateway stage layer and the Lambda alias layer
+- Both environments share the same Lambda function lineage and image source, so artifact isolation is partial rather than absolute
+- Production promotion currently reads the live Lambda version behind the `dev` alias and points the `prod` alias at that version
+- See `docs/architecture/environment-isolation.md` for the current architecture diagram and boundary explanation
 
 ### Terraform Workflow Note
 

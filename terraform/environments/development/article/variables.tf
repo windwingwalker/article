@@ -9,6 +9,12 @@ variable "project_name" {
   type        = string
 }
 
+variable "api_name" {
+  description = "Exact API Gateway name. Defaults to the shared module project-name pattern."
+  type        = string
+  default     = null
+}
+
 variable "resource_name" {
   description = "API resource path name."
   type        = string
@@ -22,4 +28,10 @@ variable "function_arn" {
 variable "authorizer_id" {
   description = "API Gateway authorizer ID for protected routes."
   type        = string
+}
+
+variable "use_stage_alias" {
+  description = "Whether API Gateway integration should invoke a Lambda alias from the stage variable."
+  type        = bool
+  default     = true
 }

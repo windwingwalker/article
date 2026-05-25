@@ -1,6 +1,6 @@
 	
 {
-  "resource": "article-catalog",
-  "path": "/",
+  "resource": "/article-catalog",
+  "path": "/article-catalog",
   "httpMethod": "GET"
 }

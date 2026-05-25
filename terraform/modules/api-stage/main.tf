@@ -1,5 +1,5 @@
 data "aws_api_gateway_rest_api" "default" {
-  name = "${var.project_name}-gateway"
+  name = coalesce(var.api_name, "${var.project_name}-gateway")
 }
 
 resource "aws_cloudwatch_log_group" "default" {
@@ -80,11 +80,22 @@ resource "aws_api_gateway_method_settings" "default" {
   }
 }
 
+locals {
+  base_path = var.base_path_override != null ? var.base_path_override : var.stage_name == "dev" ? "dev-${var.project_name}" : "${var.project_name}"
+}
+
+moved {
+  from = aws_api_gateway_base_path_mapping.default
+  to   = aws_api_gateway_base_path_mapping.default[0]
+}
+
 resource "aws_api_gateway_base_path_mapping" "default" {
+  count = var.create_base_path_mapping ? 1 : 0
+
   api_id      = data.aws_api_gateway_rest_api.default.id
   stage_name  = aws_api_gateway_stage.default.stage_name
-  domain_name = "api.windwingwalker.xyz"
-  base_path   = var.stage_name == "dev" ? "dev-${var.project_name}" : "${var.project_name}"
+  domain_name = var.domain_name
+  base_path   = local.base_path
   depends_on = [
     aws_api_gateway_deployment.default,
   ]

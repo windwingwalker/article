@@ -1,18 +1,99 @@
-module "api-gateway-stage" {
-  source       = "../../modules/api-stage"
-  project_name = local.stack_project_name
-  stage_name   = "prod"
+module "prod-api-gateway" {
+  source         = "../../modules/api-gateway"
+  project_name   = local.prod_stack_project_name
+  api_name       = local.prod_gateway_name
+  aws_account_id = var.aws_account_id
 }
 
-data "aws_lambda_alias" "default" {
-  function_name = local.function_name
-  name          = var.source_stage_name
+module "prod-api-gateway-stage" {
+  source             = "../../modules/api-stage"
+  project_name       = local.prod_stack_project_name
+  api_name           = local.prod_gateway_name
+  stage_name         = "prod"
+  base_path_override = "${local.stack_project_name}-api-prod"
+  depends_on = [
+    module.prod-article,
+    module.prod-article-catalog,
+    module.prod-article-reader-count,
+  ]
 }
 
-module "lambda-alias" {
-  source           = "../../modules/lambda-alias"
-  project_name     = local.stack_project_name
-  stage_name       = "prod"
-  function_name    = data.aws_lambda_alias.default.function_name
-  function_version = data.aws_lambda_alias.default.function_version
+module "prod-lambda" {
+  source                = "../../modules/lambda/"
+  resource_name         = local.prod_function_name
+  image_repository_name = local.stack_project_name
+  image_tag             = var.image_tag
+  lambda_env_var = {
+    ARTICLE_READ_STORE     = "dynamodb"
+    READER_COUNT_MODE      = "immediate"
+    READER_COUNT_QUEUE_URL = local.prod_reader_count_queue_url
+  }
+  depends_on = [
+    module.prod-api-gateway
+  ]
+}
+
+data "aws_api_gateway_rest_api" "prod" {
+  name = local.prod_gateway_name
+  depends_on = [
+    module.prod-api-gateway
+  ]
+}
+
+resource "aws_lambda_permission" "prod_api_gw" {
+  statement_id  = "AllowExecutionFromProdAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = module.prod-lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${data.aws_api_gateway_rest_api.prod.execution_arn}/*/*"
+}
+
+module "prod-article" {
+  source          = "../development/article"
+  aws_region      = var.aws_region
+  project_name    = local.prod_stack_project_name
+  api_name        = local.prod_gateway_name
+  resource_name   = "article"
+  function_arn    = module.prod-lambda.function_arn
+  authorizer_id   = module.prod-api-gateway.authorizer_id
+  use_stage_alias = false
+  depends_on = [
+    module.prod-api-gateway
+  ]
+}
+
+module "prod-article-catalog" {
+  source               = "../development/article-catalog"
+  aws_region           = var.aws_region
+  project_name         = local.prod_stack_project_name
+  api_name             = local.prod_gateway_name
+  api_resource_name    = "article-catalog"
+  resource_name        = local.prod_eventbridge_resource_name
+  function_name        = module.prod-lambda.function_name
+  function_arn         = module.prod-lambda.function_arn
+  authorizer_id        = module.prod-api-gateway.authorizer_id
+  target_arn           = module.prod-lambda.function_arn
+  target_function_name = module.prod-lambda.function_name
+  target_qualifier     = null
+  use_stage_alias      = false
+  depends_on = [
+    module.prod-api-gateway
+  ]
+}
+
+module "prod-article-reader-count" {
+  source                      = "../development/article-reader-count"
+  aws_region                  = var.aws_region
+  project_name                = local.prod_stack_project_name
+  api_name                    = local.prod_gateway_name
+  api_resource_name           = "article-reader-count"
+  resource_name               = local.prod_queue_resource_name
+  function_arn                = module.prod-lambda.function_arn
+  function_target             = module.prod-lambda.function_name
+  authorizer_id               = module.prod-api-gateway.authorizer_id
+  use_stage_alias             = false
+  enable_event_source_mapping = true
+  depends_on = [
+    module.prod-api-gateway
+  ]
 }

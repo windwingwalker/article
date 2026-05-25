@@ -1,5 +1,5 @@
 resource "aws_api_gateway_rest_api" "default" {
-  name = "${var.project_name}-gateway"
+  name = coalesce(var.api_name, "${var.project_name}-gateway")
 }
 
 resource "aws_api_gateway_authorizer" "default" {

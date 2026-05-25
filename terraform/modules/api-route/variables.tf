@@ -2,6 +2,11 @@ variable "project_name" {
   type = string
 }
 
+variable "api_name" {
+  type    = string
+  default = null
+}
+
 variable "resource_name" {
   type = string
 }
@@ -15,6 +20,12 @@ variable "aws_region" {
 
 variable "function_arn" {
   type = string
+}
+
+variable "use_stage_alias" {
+  description = "Whether API Gateway integration should append the stage alias variable to the Lambda ARN."
+  type        = bool
+  default     = true
 }
 
 variable "http_method" {

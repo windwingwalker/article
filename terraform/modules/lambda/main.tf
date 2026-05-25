@@ -7,7 +7,7 @@ data "aws_iam_role" "default" {
 }
 
 data "aws_ecr_repository" "default" {
-  name = var.resource_name
+  name = coalesce(var.image_repository_name, var.resource_name)
 }
 
 resource "aws_lambda_function" "default" {

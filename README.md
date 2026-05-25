@@ -1,63 +1,57 @@
 # Article
 
-## Background
+Serverless backend for article publishing on `windwingwalker.xyz`.
 
-- This **repository** stores everything of an application.
-- The **application** is one of the back-end application of [my blog](https://windwingwalker.xyz/).
-- The application consists of **microservices**.
-- Each microservice represents an **resource** related to articles.
-- Each resource
-  - provide **operations** (e.g. CRUD) to it.  
-  - has <= 1 database.
-  - has one computation unit (Lambda) and one API gateway.
+## What This Repo Contains
 
-## Architecture
+- Application code for article APIs and background processing
+- Terraform for shared, development, and production infrastructure
+- Question-oriented documentation under `docs/`
 
-[!Architecture](architecture.drawio.png)
+## Documentation
 
-## Tech stack
+This repository uses a question-based documentation structure.
 
-- Infrastructure: AWS
-- Infrastructure as Code (IaC): Terraform
-- Programming Language: TypeScript
-- Back-end runtime environment: Node.js
-- CI/CD Pipeline: Jenkins
-- Container Image: Docker
+The root `README.md` is the primary documentation map. Each section folder in `docs/` owns a small set of related questions. Each section `README.md` is an index. Leaf documents stay narrow and self-contained. Do not add `docs/README.md`.
 
-## Repository strusture
+## Sections
 
-- `microservices/`: Store source code of each microservices.
-- `iac/`: Store the infrastructure as code templates that can be used across microservices.
-- `model/`: Store the data model shared across microservices.
-- `docs/`: Store design decisions, guides, runbooks, and future improvements.
+- [Overview](/Users/windwingwalker/Vault/Code/my-code/article/docs/overview/README.md): What the application is for, who it serves, and where it fits.
+- [Architecture](/Users/windwingwalker/Vault/Code/my-code/article/docs/architecture/README.md): Runtime flow, boundaries, dependencies, and infrastructure shape.
+- [Data](/Users/windwingwalker/Vault/Code/my-code/article/docs/data/README.md): Core entities, storage, and source-of-truth rules.
+- [Interfaces](/Users/windwingwalker/Vault/Code/my-code/article/docs/interfaces/README.md): API resources, triggers, and input/output boundaries.
+- [Development](/Users/windwingwalker/Vault/Code/my-code/article/docs/dev/README.md): Local work, testing, configuration, and repo workflow.
+- [Delivery](/Users/windwingwalker/Vault/Code/my-code/article/docs/delivery/README.md): Build, CI/CD, promotion, and backend bootstrap dependencies.
+- [Operations](/Users/windwingwalker/Vault/Code/my-code/article/docs/ops/README.md): Runbooks, recovery, and operational risks.
+- [Roadmap](/Users/windwingwalker/Vault/Code/my-code/article/docs/roadmap/README.md): Deferred improvements and future architecture work.
 
-## Documents
+## Commands
 
-- [Infrastructure Cost Over Availability](docs/decisions/0001-infrastructure-cost-over-availability.md)
-- [Terraform Remote State And Workflow-Only Execution](docs/decisions/0002-terraform-local-state.md)
-- [Production Promotion Follows Dev Alias](docs/decisions/0003-production-promotion-follows-dev-alias.md)
-- [GitHub Actions CI/CD And Deployment Strategy](docs/guides/github-actions-cicd-and-deployment-strategy.md)
-- [GitHub OIDC AWS Bootstrap Requirements](docs/guides/github-oidc-aws-bootstrap-requirements.md)
-- [R2 Backend Configuration And Migration](docs/guides/r2-backend-configuration-and-migration.md)
-- [R2 Terraform Backend Bootstrap Requirements](docs/guides/r2-terraform-backend-bootstrap-requirements.md)
-- [Terraform State Recovery Runbook](docs/runbooks/terraform-state-recovery.md)
-- [CI/CD-Driven Production Promotion](docs/future-improvements/0001-cicd-driven-production-promotion.md)
-- [Datastore Migration For Safer Write Testing](docs/future-improvements/0002-datastore-migration-for-safer-write-testing.md)
+- Build: `npm run build`
+- Test: `npm test`
+- Dev: `npm start`
+- Local Lambda invocation: `npm run local -- <event.json>`
+- R2 migration dry run: `npm run migrate:r2 -- --dry-run`
+- R2 comparison: `npm run compare:r2`
 
-## List of microservices
+## Runtime
 
-- article: An article is just an article
-- article-catalog: A article catalog stores the metadata of all articles
-- article-reader-count: Click stream from end user
+- Node target: `24`
+- Lambda model: one entrypoint in `src/controller.ts`
+- Request flow: Lambda event -> router -> services -> storage or queue adapter
 
-## List of applied AWS services
 
-- ECR
-- Lambda
-- API Gateway
-- EventBridge
-- SQS
-- AWS Backup
-- CloudWatch
-- DynamoDB
-- Cognito User Pool
+- Where does this app run? 
+  - AWS and Local
+- How to trigger this app?
+  - 
+- How to run this app?
+  - In AWS
+
+- How to build this app?
+- What to test?
+  - Database connection
+  - Article write
+  - Article read
+  - Catalog write
+  - Catalog read

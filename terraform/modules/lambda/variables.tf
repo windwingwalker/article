@@ -2,6 +2,12 @@ variable "resource_name" {
   type = string
 }
 
+variable "image_repository_name" {
+  description = "ECR repository name for the Lambda image. Defaults to resource_name."
+  type        = string
+  default     = null
+}
+
 variable "image_tag" {
   type = string
 }

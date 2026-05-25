@@ -44,19 +44,45 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN_PRODUCTION }}
 
+      - name: Read Terraform Backend Config
+        id: tf_backend
+        env:
+          PARAMETER_PREFIX: /shared/terraform-state-bucket
+        run: |
+          set -euo pipefail
+
+          ACCESS_KEY_ID="$(aws ssm get-parameter --name "${PARAMETER_PREFIX}/access-key-id" --with-decryption --query 'Parameter.Value' --output text)"
+          ACCOUNT_ID="$(aws ssm get-parameter --name "${PARAMETER_PREFIX}/account-id" --query 'Parameter.Value' --output text)"
+          BUCKET_NAME="$(aws ssm get-parameter --name "${PARAMETER_PREFIX}/bucket-name" --query 'Parameter.Value' --output text)"
+          SECRET_ACCESS_KEY="$(aws ssm get-parameter --name "${PARAMETER_PREFIX}/secret-access-key" --with-decryption --query 'Parameter.Value' --output text)"
+          S3_ENDPOINT="https://${ACCOUNT_ID}.r2.cloudflarestorage.com"
+
+          echo "::add-mask::${ACCESS_KEY_ID}"
+          echo "::add-mask::${ACCOUNT_ID}"
+          echo "::add-mask::${BUCKET_NAME}"
+          echo "::add-mask::${SECRET_ACCESS_KEY}"
+          echo "::add-mask::${S3_ENDPOINT}"
+
+          echo "access_key_id=${ACCESS_KEY_ID}" >> "${GITHUB_OUTPUT}"
+          echo "bucket_name=${BUCKET_NAME}" >> "${GITHUB_OUTPUT}"
+          echo "secret_access_key=${SECRET_ACCESS_KEY}" >> "${GITHUB_OUTPUT}"
+          echo "s3_endpoint=${S3_ENDPOINT}" >> "${GITHUB_OUTPUT}"
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init Production
         working-directory: terraform/environments/production
         env:
-          TF_BACKEND_ACCESS_KEY: ${{ secrets.TF_BACKEND_ACCESS_KEY }}
-          TF_BACKEND_SECRET_KEY: ${{ secrets.TF_BACKEND_SECRET_KEY }}
-          TF_BACKEND_S3_ENDPOINT: ${{ secrets.TF_BACKEND_S3_ENDPOINT }}
+          TF_BACKEND_ACCESS_KEY: ${{ steps.tf_backend.outputs.access_key_id }}
+          TF_BACKEND_BUCKET_NAME: ${{ steps.tf_backend.outputs.bucket_name }}
+          TF_BACKEND_SECRET_KEY: ${{ steps.tf_backend.outputs.secret_access_key }}
+          TF_BACKEND_S3_ENDPOINT: ${{ steps.tf_backend.outputs.s3_endpoint }}
         run: |
           terraform init \
             -input=false \
             -backend-config="../../../backend.r2.hcl" \
+            -backend-config="bucket=${TF_BACKEND_BUCKET_NAME}" \
             -backend-config="key=article/production/terraform.tfstate" \
             -backend-config="endpoint=${TF_BACKEND_S3_ENDPOINT}" \
             -backend-config="access_key=${TF_BACKEND_ACCESS_KEY}" \
