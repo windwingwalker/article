@@ -93,8 +93,6 @@ export const getLambdaEventSource = (event: any): string => {
     return "api-delete"
   else if (event["Records"] && event["Records"][0]["eventSource"] == "aws:s3")
     return "s3"
-  else if (event["Records"] && event["Records"][0]["eventSource"] == "aws:sqs")
-    return "sqs"
   else if (event["source"] && event["source"] == "aws.events" && event["detail-type"] == "Scheduled Event")
     return "cron"
   else

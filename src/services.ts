@@ -6,7 +6,7 @@ import HTTPResponse from "./models/HTTPResponse";
 import PlainArticle from "./models/PlainArticle";
 import { createArticleStore } from "./articleStore";
 import { createSqsReaderCountQueue } from "./readerCountQueue";
-import { drainArticleReaderCounts, ReaderCountQueue } from "./viewCounter";
+import { drainArticleReaderCounts } from "./viewCounter";
 
 export const getArticleService = async (event): Promise<HTTPResponse> => {
   const firstPublished: string = event["queryStringParameters"]['firstPublished']
@@ -62,19 +62,6 @@ export const postArticleReaderCountService = async (event): Promise<HTTPResponse
   const firstPublished: string = event["queryStringParameters"]['firstPublished']
   await pushMessageToQueue(firstPublished, await getReaderCountQueueUrl());
   return new HTTPResponse(200, firstPublished)
-}
-
-export const sumArticleReaderCountService = async (event): Promise<HTTPResponse> => {
-  const messages = event["Records"].map((message, index) => ({
-    id: index.toString(),
-    firstPublished: message["body"],
-  }));
-  const queue: ReaderCountQueue = {
-    receive: async () => messages.splice(0, messages.length),
-    delete: async () => {},
-  };
-  const result = await drainArticleReaderCounts(queue, createArticleStore());
-  return new HTTPResponse(200, result);
 }
 
 const getReaderCountQueueUrl = async (): Promise<string> => {

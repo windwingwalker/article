@@ -1,6 +1,6 @@
 import HTTPResponse from "./models/HTTPResponse";
 import { getAPIResource, getLambdaEventSource } from "./functions"
-import { getArticleCatalogService, getArticleService, postArticleReaderCountService, putArticleCatalogService, putArticleService, scheduledPutArticleCatalogService, sumArticleReaderCountService } from "./services";
+import { getArticleCatalogService, getArticleService, postArticleReaderCountService, putArticleCatalogService, putArticleService, scheduledPutArticleCatalogService } from "./services";
 
 export const lambdaHandler = async (event, context) => {
   var httpResponse: HTTPResponse = null;
@@ -41,10 +41,6 @@ export const lambdaHandler = async (event, context) => {
     } else if (source == "api-post") {
       console.info("Calling service postArticleReaderCountService()");
       httpResponse = await postArticleReaderCountService(event);
-
-    } else if (source == "sqs") {
-      console.info("Calling service sumArticleReaderCountService()");
-      httpResponse = await sumArticleReaderCountService(event);
 
     } else if (source == "cron") {
       console.info("Calling service scheduledPutArticleCatalogService()");
