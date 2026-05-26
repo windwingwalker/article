@@ -17,6 +17,8 @@ concurrency:
 env:
   AWS_REGION: us-east-1
   TF_VAR_project_name: article
+  ECR_REPOSITORY: article
+  IMAGE_TAG: sha-${{ github.sha }}
   TF_IN_AUTOMATION: true
 
 jobs:
@@ -61,6 +63,15 @@ jobs:
           echo "secret_access_key=${SECRET_ACCESS_KEY}" >> "${GITHUB_OUTPUT}"
           echo "s3_endpoint=${S3_ENDPOINT}" >> "${GITHUB_OUTPUT}"
 
+      - name: Verify Promoted Image Exists
+        run: |
+          aws ecr describe-images \
+            --repository-name "${ECR_REPOSITORY}" \
+            --image-ids imageTag="${IMAGE_TAG}" \
+            --region "${AWS_REGION}" \
+            --query 'imageDetails[0].imageTags' \
+            --output text
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -85,12 +96,14 @@ jobs:
         working-directory: terraform/environments/production
         env:
           TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
+          TF_VAR_image_tag: ${{ env.IMAGE_TAG }}
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply Production
         working-directory: terraform/environments/production
         env:
           TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
+          TF_VAR_image_tag: ${{ env.IMAGE_TAG }}
         run: terraform apply -input=false -auto-approve tfplan
 
       - name: Calculate Next Release Tag

@@ -43,15 +43,3 @@ variable "api_domain_name" {
   type        = string
   default     = "api.windwingwalker.xyz"
 }
-
-variable "article_read_store" {
-  description = "Article read target. Use dynamodb during migration and r2 after cutover."
-  type        = string
-  default     = "dynamodb"
-}
-
-variable "reader_count_mode" {
-  description = "Reader-count processing mode. Use immediate during migration and daily-drain after SQS event source removal."
-  type        = string
-  default     = "immediate"
-}

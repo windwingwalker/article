@@ -61,7 +61,7 @@ This is a **serverless backend application** for a personal blog (`windwingwalke
 1. **index.ts** - Single Lambda entry point (`lambdaHandler`). Routes based on event source (`api-get`, `api-put`, `api-post`, `sqs`, `cron`) and API resource path (`/article`, `/article-catalog`).
 2. **functions.ts** - Pure utility functions: `pharseMarkdown` (parses custom markdown format into structured JSON), `getLambdaEventSource` (detects Lambda trigger type), `articleIsExisted`, `rewriteArticleCatalog`, `rewriteArticle`.
 3. **services.ts** - Service layer orchestrating business logic for each operation (get/put article, get/put catalog, reader count tracking, scheduled catalog sync).
-4. **io.ts** - Data access layer wrapping AWS SDK clients (DynamoDB, SQS, SSM). Region is hardcoded to `us-east-1`.
+4. **io.ts** - Data access layer wrapping AWS SDK clients (SQS, SSM). Region is hardcoded to `us-east-1`.
 
 ## Data Model
 
@@ -109,7 +109,8 @@ Articles are written in a custom markdown variant parsed by `pharseMarkdown` in 
 
 Tests live in `tests/` using mocha + chai. Test fixtures are `.txt` (markdown input) and `.json` (expected parsed output) file pairs. Tests currently cover `pharseMarkdown` only. Tests must be run from the project root (fixtures use relative paths like `./tests/valid-article.txt`).
 
-## DynamoDB Tables
+## R2 Object Layout
 
-- `articles` - Partition key: `firstPublished` (Number), uses Query with `ScanIndexForward: false`
-- `article-catalog` - Partition key: `id` (Number, always `1`), single-record table
+- Article versions: `articles/{firstPublished}/versions/{lastModified}.json`
+- Latest article pointer: `articles/{firstPublished}/latest.json`
+- Catalog: `catalog/latest.json`

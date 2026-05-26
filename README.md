@@ -31,8 +31,6 @@ The root `README.md` is the primary documentation map. Each section folder in `d
 - Test: `npm test`
 - Dev: `npm start`
 - Local Lambda invocation: `npm run local -- <event.json>`
-- R2 migration dry run: `npm run migrate:r2 -- --dry-run`
-- R2 comparison: `npm run compare:r2`
 
 ## Runtime
 

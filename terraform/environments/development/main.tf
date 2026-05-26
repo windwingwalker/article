@@ -46,8 +46,6 @@ module "dev-lambda" {
     R2_BUCKET_NAME         = data.aws_ssm_parameter.article_r2_bucket_name.value
     R2_ACCESS_KEY_ID       = data.aws_ssm_parameter.article_r2_access_key_id.value
     R2_SECRET_ACCESS_KEY   = data.aws_ssm_parameter.article_r2_secret_access_key.value
-    ARTICLE_READ_STORE     = "r2"
-    READER_COUNT_MODE      = "daily-drain"
     READER_COUNT_QUEUE_URL = "https://sqs.${var.aws_region}.amazonaws.com/${var.aws_account_id}/${local.dev_queue_resource_name}"
   }
   depends_on = [

@@ -3,7 +3,7 @@ name: Deploy Development
 on:
   workflow_run:
     workflows:
-      - CI
+      - Build
     types:
       - completed
     branches:
@@ -21,8 +21,6 @@ concurrency:
 env:
   AWS_REGION: us-east-1
   TF_VAR_project_name: article
-  ECR_REPOSITORY: article
-  IMAGE_TAG: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
   TF_IN_AUTOMATION: true
 
 jobs:
@@ -38,17 +36,15 @@ jobs:
         with:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
+      - name: Prepare Image Tags
+        id: image_tags
+        run: |
+          set -euo pipefail
 
-      - name: Install Dependencies
-        run: npm ci
+          COMMIT_SHA="${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+          DEPLOY_TAG="sha-${COMMIT_SHA}"
 
-      - name: Build
-        run: npm run build
+          echo "deploy_tag=${DEPLOY_TAG}" >> "${GITHUB_OUTPUT}"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -110,20 +106,6 @@ jobs:
         working-directory: terraform/environments/pre-development
         run: terraform apply -input=false -auto-approve tfplan
 
-      - name: Login To Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build And Push Image
-        id: image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
-          docker build -t "${IMAGE_URI}" .
-          docker push "${IMAGE_URI}"
-          echo "image_uri=${IMAGE_URI}" >> "${GITHUB_OUTPUT}"
-
       - name: Terraform Init Development
         working-directory: terraform/environments/development
         env:
@@ -132,7 +114,7 @@ jobs:
           TF_BACKEND_SECRET_KEY: ${{ steps.tf_backend.outputs.secret_access_key }}
           TF_BACKEND_S3_ENDPOINT: ${{ steps.tf_backend.outputs.s3_endpoint }}
           TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
-          TF_VAR_image_tag: ${{ env.IMAGE_TAG }}
+          TF_VAR_image_tag: ${{ steps.image_tags.outputs.deploy_tag }}
         run: |
           terraform init \
             -input=false \
@@ -147,12 +129,12 @@ jobs:
         working-directory: terraform/environments/development
         env:
           TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
-          TF_VAR_image_tag: ${{ env.IMAGE_TAG }}
+          TF_VAR_image_tag: ${{ steps.image_tags.outputs.deploy_tag }}
         run: terraform plan -input=false -out=tfplan
 
       - name: Terraform Apply Development
         working-directory: terraform/environments/development
         env:
           TF_VAR_project_name: ${{ env.TF_VAR_project_name }}
-          TF_VAR_image_tag: ${{ env.IMAGE_TAG }}
+          TF_VAR_image_tag: ${{ steps.image_tags.outputs.deploy_tag }}
         run: terraform apply -input=false -auto-approve tfplan

@@ -4,8 +4,7 @@
 
 - API Gateway routes
 - EventBridge scheduled invocations
-- SQS event-source messages for reader-count updates
-- SQS messages drained by the scheduled reader-count job after the daily-drain cutover
+- SQS messages drained by the scheduled reader-count job
 
 ## What resources does the API expose?
 
@@ -15,7 +14,7 @@
 
 ## How does `/article-reader-count` work?
 
-The frontend calls `POST /article-reader-count?firstPublished=...`. The API writes one SQS message immediately. During migration, the existing SQS event source invokes Lambda and updates DynamoDB. After the daily-drain cutover, the scheduled invocation can drain the queue and materialize summed views through the configured article store.
+The frontend calls `POST /article-reader-count?firstPublished=...`. The API writes one SQS message immediately. The scheduled invocation drains the queue and materializes summed views through the configured article store.
 
 ## Where is interface routing defined?
 

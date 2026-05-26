@@ -1,3 +1,21 @@
+data "aws_ssm_parameter" "article_r2_access_key_id" {
+  name            = "/article/article-data-store/access-key-id"
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "article_r2_account_id" {
+  name = "/article/article-data-store/account-id"
+}
+
+data "aws_ssm_parameter" "article_r2_bucket_name" {
+  name = "/article/article-data-store/bucket-name"
+}
+
+data "aws_ssm_parameter" "article_r2_secret_access_key" {
+  name            = "/article/article-data-store/secret-access-key"
+  with_decryption = true
+}
+
 module "prod-api-gateway" {
   source         = "../../modules/api-gateway"
   project_name   = local.prod_stack_project_name
@@ -24,8 +42,10 @@ module "prod-lambda" {
   image_repository_name = local.stack_project_name
   image_tag             = var.image_tag
   lambda_env_var = {
-    ARTICLE_READ_STORE     = "dynamodb"
-    READER_COUNT_MODE      = "immediate"
+    R2_ACCOUNT_ID          = data.aws_ssm_parameter.article_r2_account_id.value
+    R2_BUCKET_NAME         = data.aws_ssm_parameter.article_r2_bucket_name.value
+    R2_ACCESS_KEY_ID       = data.aws_ssm_parameter.article_r2_access_key_id.value
+    R2_SECRET_ACCESS_KEY   = data.aws_ssm_parameter.article_r2_secret_access_key.value
     READER_COUNT_QUEUE_URL = local.prod_reader_count_queue_url
   }
   depends_on = [
@@ -92,7 +112,7 @@ module "prod-article-reader-count" {
   function_target             = module.prod-lambda.function_name
   authorizer_id               = module.prod-api-gateway.authorizer_id
   use_stage_alias             = false
-  enable_event_source_mapping = true
+  enable_event_source_mapping = false
   depends_on = [
     module.prod-api-gateway
   ]

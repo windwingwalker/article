@@ -19,4 +19,4 @@ Application code is built with TypeScript and packaged into a Lambda-compatible 
 - [R2 Backend Migration](/Users/windwingwalker/Vault/Code/my-code/article/docs/delivery/r2-backend-migration.md)
 - [R2 Backend Bootstrap](/Users/windwingwalker/Vault/Code/my-code/article/docs/delivery/r2-backend-bootstrap.md)
 - [Decision: Remote State And Workflow-Only Execution](/Users/windwingwalker/Vault/Code/my-code/article/docs/delivery/decision-remote-state-and-workflow-only.md)
-- [Decision: Production Promotion Follows Dev Alias](/Users/windwingwalker/Vault/Code/my-code/article/docs/delivery/decision-production-follows-dev-alias.md)
+- [Decision: Production Promotion Uses Commit Image Tag](/Users/windwingwalker/Vault/Code/my-code/article/docs/delivery/decision-production-image-tag.md)

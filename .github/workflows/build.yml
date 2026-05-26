@@ -1,0 +1,90 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: article
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Fmt
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: |
+          set -euo pipefail
+
+          for root in \
+            terraform/environments/pre-development \
+            terraform/environments/development \
+            terraform/environments/production
+          do
+            terraform -chdir="${root}" init -backend=false -input=false
+            terraform -chdir="${root}" validate
+          done
+
+      - name: Prepare Image Tags
+        id: image_tags
+        run: |
+          set -euo pipefail
+
+          echo "deploy_tag=sha-${GITHUB_SHA}" >> "${GITHUB_OUTPUT}"
+          echo "human_tag=${GITHUB_RUN_NUMBER}" >> "${GITHUB_OUTPUT}"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN_DEVELOPMENT }}
+
+      - name: Login To Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build And Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DEPLOY_TAG: ${{ steps.image_tags.outputs.deploy_tag }}
+          HUMAN_TAG: ${{ steps.image_tags.outputs.human_tag }}
+        run: |
+          set -euo pipefail
+
+          DEPLOY_IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${DEPLOY_TAG}"
+          HUMAN_IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${HUMAN_TAG}"
+
+          docker build -t "${DEPLOY_IMAGE_URI}" -t "${HUMAN_IMAGE_URI}" .
+          docker push "${DEPLOY_IMAGE_URI}"
+          docker push "${HUMAN_IMAGE_URI}"

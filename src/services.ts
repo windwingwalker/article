@@ -1,5 +1,5 @@
 import { articleIsExisted, pharseMarkdown, rewriteArticle, rewriteArticleCatalog } from "./functions";
-import { getParameterFromSSM, pushMessageToQueue, updateArticleReadCountToDB } from "./io";
+import { getParameterFromSSM, pushMessageToQueue } from "./io";
 import Article from "./models/Article";
 import ArticleCatalog from "./models/ArticleCatalog";
 import HTTPResponse from "./models/HTTPResponse";
@@ -46,26 +46,7 @@ export const putArticleCatalogService = async (event): Promise<HTTPResponse>  =>
 }
 
 export const scheduledPutArticleCatalogService = async (): Promise<HTTPResponse> => {
-  if (process.env.READER_COUNT_MODE == "daily-drain") {
-    const queueUrl = await getReaderCountQueueUrl();
-    const result = await drainArticleReaderCounts(
-      createSqsReaderCountQueue(queueUrl),
-      createArticleStore(),
-    );
-    return new HTTPResponse(200, result)
-  }
-
-  const store = createArticleStore();
-  var articleCatalog: ArticleCatalog = await store.getArticleCatalog()
-
-  for (var i = 0; i < articleCatalog["body"].length; i++){
-    const firstPublished: string = articleCatalog["body"][i]["firstPublished"].toString()
-    const article: Article = await store.getArticle(firstPublished);
-
-    articleCatalog["body"][i]["views"] = article["views"] 
-  }
-  await store.putArticleCatalog(articleCatalog);
-  return new HTTPResponse(200, articleCatalog)
+  return drainArticleReaderCountService();
 }
 
 export const drainArticleReaderCountService = async (): Promise<HTTPResponse> => {
@@ -84,19 +65,6 @@ export const postArticleReaderCountService = async (event): Promise<HTTPResponse
 }
 
 export const sumArticleReaderCountService = async (event): Promise<HTTPResponse> => {
-  if (process.env.READER_COUNT_MODE != "daily-drain") {
-    const messageList = event["Records"]
-
-    for (var message of messageList){
-      const firstPublished: string = message["body"]
-      console.info("Message is: " + firstPublished)
-      var article: Article = await createArticleStore().getArticle(firstPublished);
-
-      await updateArticleReadCountToDB(article["firstPublished"], article["lastModified"]);
-    };
-    return new HTTPResponse(200, `Successfully Updated ${messageList.length} views`);
-  }
-
   const messages = event["Records"].map((message, index) => ({
     id: index.toString(),
     firstPublished: message["body"],

@@ -16,7 +16,6 @@ resource "aws_resourcegroups_group" "default" {
     "AWS::Config::ConfigRule",
     "AWS::Cognito::IdentityPool",
     "AWS::Cognito::UserPool",
-    "AWS::DynamoDB::Table",
     "AWS::EC2::Host",
     "AWS::EC2::Image",
     "AWS::EC2::Instance",

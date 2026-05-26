@@ -8,8 +8,7 @@ The goal is to replace Jenkins with GitHub Actions while keeping production prom
 
 ## What delivery model does this repository want?
 
-- Pull requests into `develop` should validate only.
-- Pushes to `develop` should run CI, then deploy development automatically after CI succeeds.
+- Pushes to `develop` should build, test, publish the Docker image, then deploy development automatically after the build succeeds.
 - Production promotion should stay explicit and approval-gated.
 - AWS access should use GitHub OIDC instead of long-lived access keys.
 - Deployment artifacts should be immutable.
@@ -25,13 +24,11 @@ The goal is to replace Jenkins with GitHub Actions while keeping production prom
 
 ## What branch and promotion flow is intended?
 
-- Feature branches open pull requests into `develop`.
-- Pull requests run validation only.
 - `develop` is the source of truth for development deployment.
-- Pushes to `develop` trigger CI; a successful CI run triggers image publish and development apply.
+- Pushes to `develop` trigger the build workflow; a successful build triggers development apply.
 - Pushes to `production`, or an approved manual production workflow, promote production.
 
-This repository currently accepts alias-based production promotion. Production reads the version currently behind the selected source alias instead of promoting a version-pinned artifact. See [decision-production-follows-dev-alias.md](/Users/windwingwalker/Vault/Code/my-code/article/docs/delivery/decision-production-follows-dev-alias.md).
+Production deploys the image tagged with the exact production branch commit. See [decision-production-image-tag.md](/Users/windwingwalker/Vault/Code/my-code/article/docs/delivery/decision-production-image-tag.md).
 
 ## What GitHub configuration is required?
 
@@ -39,9 +36,8 @@ This repository currently accepts alias-based production promotion. Production r
 
 - Protect `develop`.
 - Protect `production`.
-- Require pull request review.
-- Require required status checks before merge.
-- Restrict direct pushes when practical.
+- Require required status checks when practical.
+- Restrict direct pushes to `production` when practical.
 
 ### What environments are expected?
 
@@ -102,17 +98,15 @@ Acceptable fallback:
 
 The intended workflow set is:
 
-- `.github/workflows/ci.yml`
+- `.github/workflows/build.yml`
 - `.github/workflows/deploy-development.yml`
 - `.github/workflows/promote-production.yml`
 
-## What should `ci.yml` do?
+## What should `build.yml` do?
 
 Trigger:
 
-- pushes and pull requests targeting `develop`
-- pushes and pull requests targeting `production`
-- manual `workflow_dispatch`
+- push to `develop`
 
 Responsibilities:
 
@@ -120,28 +114,28 @@ Responsibilities:
 - `npm test`
 - `npm run build`
 - `docker build`
+- push the image as `sha-<commit-sha>`
+- push the same image with the human-readable numeric workflow run tag
 - `terraform fmt -check`
 - `terraform init -backend=false`
 - `terraform validate` for affected roots
 
 Expected outcome:
 
-- failing checks block merge
+- failing checks block development deployment
 
 ## What should `deploy-development.yml` do?
 
 Trigger:
 
-- successful `CI` workflow completion on `develop`
+- successful `Build` workflow completion on `develop`
 - manual `workflow_dispatch`
 
 Responsibilities:
 
-- build the application
 - apply `terraform/environments/pre-development` only when bootstrap-related files changed
-- build and push the Docker image
 - plan and apply `terraform/environments/development`
-- deploy development with the new artifact reference
+- deploy development with `image_tag=sha-<commit-sha>`
 - capture deployment metadata for later promotion
 
 Deployment metadata should include:
@@ -162,29 +156,26 @@ Trigger:
 Responsibilities:
 
 - require `production` environment approval
+- verify the `sha-<commit-sha>` image exists in ECR
 - plan `terraform/environments/production`
 - surface the plan for review
 - apply only after approval
 - create a release tag after successful promotion
 
-## What limitation still exists in the current promotion model?
+## How does production choose an image?
 
-The production root still promotes from a source Lambda alias, not from an explicit image digest or exact Lambda version.
+Production deploys the image tagged with the exact production branch commit:
 
-That means:
+- `sha-<production-branch-commit-sha>`
 
-- production promotes whatever version the selected alias points to at promotion time
-- exact artifact promotion is still a target design, not the current implementation
+If that image does not exist in ECR, the production workflow fails instead of rebuilding an unverified artifact.
 
 ## What runtime inputs do the workflows expect today?
 
-- `TF_BACKEND_ACCESS_KEY`
-- `TF_BACKEND_SECRET_KEY`
-- `TF_BACKEND_S3_ENDPOINT`
 - `AWS_DEPLOY_ROLE_ARN_DEVELOPMENT`
 - `AWS_DEPLOY_ROLE_ARN_PRODUCTION`
 
-The backend endpoint is treated as sensitive runtime configuration and is not committed in repository files.
+Terraform backend and article R2 credentials are read from AWS Systems Manager Parameter Store.
 
 ## What Terraform delivery rules matter most?
 
@@ -217,7 +208,7 @@ Keep each root independently plannable and applicable.
 
 ## In what order should this be implemented?
 
-1. Add `ci.yml` and make it required for pull requests.
+1. Add `build.yml` and make it produce immutable ECR images.
 2. Move Terraform state to a remote backend.
 3. Configure GitHub OIDC roles in AWS.
 4. Add `deploy-development.yml`.
