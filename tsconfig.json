@@ -9,10 +9,10 @@
     "resolveJsonModule": true,
     // "rootDir": "src",
     "allowJs": true,
-    "target": "es6",
+    "target": "es6"
   },
   "include": [
-    "src/**/*", 
+    "src/**/*",
     "tests/**/*",
     "tests/**/*.txt"
   ]

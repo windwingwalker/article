@@ -42,10 +42,10 @@ The root `README.md` is the primary documentation map. Each section folder in `d
 - Where does this app run? 
   - AWS and Local
 - How to trigger this app?
-  - 
+  -
+- What environment we have? What are the differences?
 - How to run this app?
   - In AWS
-
 - How to build this app?
 - What to test?
   - Database connection
