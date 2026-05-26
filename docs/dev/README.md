@@ -24,14 +24,7 @@
 
 `npm run local` reads a Lambda-style event from a JSON file argument. If no file is passed, it reads JSON from stdin.
 
-Local commands load `.env` from the repository root when it exists. Fill in only the values needed for the command you are running. Real `.env` files are ignored by git.
-
-Article/catalog storage uses R2. For local article reads and writes, set:
-
-- `R2_ACCOUNT_ID`
-- `R2_BUCKET_NAME`
-- `R2_ACCESS_KEY_ID`
-- `R2_SECRET_ACCESS_KEY`
+Article/catalog storage uses R2 credentials from AWS Systems Manager Parameter Store. For local article reads and writes, use AWS SDK credentials that can read `/article/article-data-store/*`.
 
 ## How do you call the isolated dev API?
 

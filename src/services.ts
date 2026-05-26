@@ -10,7 +10,8 @@ import { drainArticleReaderCounts } from "./viewCounter";
 
 export const getArticleService = async (event): Promise<HTTPResponse> => {
   const firstPublished: string = event["queryStringParameters"]['firstPublished']
-  const article: Article = await createArticleStore().getArticle(firstPublished);
+  const store = await createArticleStore();
+  const article: Article = await store.getArticle(firstPublished);
   return new HTTPResponse(200, article);
 }
 
@@ -18,7 +19,7 @@ export const putArticleService = async (event): Promise<HTTPResponse> => {
   const markdownArticle: string = event["body"];
   const plainArticle: PlainArticle = pharseMarkdown(markdownArticle);
   var article: Article = new Article(plainArticle);
-  const store = createArticleStore();
+  const store = await createArticleStore();
   var articleCatalog: ArticleCatalog = await store.getArticleCatalog();
 
   const articleIndex: number = articleIsExisted(articleCatalog, article);
@@ -35,13 +36,15 @@ export const putArticleService = async (event): Promise<HTTPResponse> => {
 }
 
 export const getArticleCatalogService = async (): Promise<HTTPResponse> => {
-  const articleCatalog: ArticleCatalog = await createArticleStore().getArticleCatalog()
+  const store = await createArticleStore();
+  const articleCatalog: ArticleCatalog = await store.getArticleCatalog()
   return new HTTPResponse(200, articleCatalog)
 }
 
 export const putArticleCatalogService = async (event): Promise<HTTPResponse>  => {
   const articleCatalog: ArticleCatalog = event["body"];
-  await createArticleStore().putArticleCatalog(articleCatalog);
+  const store = await createArticleStore();
+  await store.putArticleCatalog(articleCatalog);
   return new HTTPResponse(200, articleCatalog)
 }
 
@@ -53,7 +56,7 @@ export const drainArticleReaderCountService = async (): Promise<HTTPResponse> =>
   const queueUrl = await getReaderCountQueueUrl();
   const result = await drainArticleReaderCounts(
     createSqsReaderCountQueue(queueUrl),
-    createArticleStore(),
+    await createArticleStore(),
   );
   return new HTTPResponse(200, result)
 }

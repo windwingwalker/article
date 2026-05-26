@@ -44,9 +44,6 @@
 **/__pycache__/
 **/pythonclient/
 ## Dev
-**/.env
-**/.env.local
-**/.env.*.local
 **/.devcontainer/
 **/test.md
 **/response.json

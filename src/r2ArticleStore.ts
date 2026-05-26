@@ -3,6 +3,16 @@ import Article from "./models/Article";
 import ArticleCatalog from "./models/ArticleCatalog";
 import { ArticleCatalogNotFoundError, ArticleCatalogUploadError, ArticleNotFoundError, ArticleUploadError } from "./models/Error";
 import { ArticleStore } from "./viewCounter";
+import { getParameterFromSSM } from "./io";
+
+interface R2StoreConfig {
+  accountId: string;
+  bucketName: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+}
+
+const parameterPath = (name: string): string => `/article/article-data-store/${name}`;
 
 const readBodyAsString = async (body: any): Promise<string> => {
   if (body == null) return "";
@@ -82,31 +92,28 @@ export class R2ArticleStore implements ArticleStore {
   }
 }
 
-export const createR2ArticleStore = (): R2ArticleStore => {
-  const accountId = process.env.R2_ACCOUNT_ID?.trim();
-  const bucketName = process.env.R2_BUCKET_NAME?.trim();
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID?.trim();
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY?.trim();
-  const sessionToken = process.env.R2_SESSION_TOKEN?.trim();
+export const createR2ArticleStore = async (): Promise<R2ArticleStore> => {
+  const config: R2StoreConfig = {
+    accountId: await getParameterFromSSM(parameterPath("account-id")),
+    bucketName: await getParameterFromSSM(parameterPath("bucket-name")),
+    accessKeyId: await getParameterFromSSM(parameterPath("access-key-id"), true),
+    secretAccessKey: await getParameterFromSSM(parameterPath("secret-access-key"), true),
+  };
 
-  if (bucketName == null || bucketName == "") throw new Error("R2_BUCKET_NAME is required");
-  if ((accountId == null || accountId == "") && process.env.R2_ENDPOINT == null) throw new Error("R2_ACCOUNT_ID or R2_ENDPOINT is required");
-  if (accessKeyId == null || accessKeyId == "") throw new Error("R2_ACCESS_KEY_ID is required");
-  if (secretAccessKey == null || secretAccessKey == "") throw new Error("R2_SECRET_ACCESS_KEY is required");
+  if (config.accountId.trim() == "") throw new Error(`${parameterPath("account-id")} is required`);
+  if (config.bucketName.trim() == "") throw new Error(`${parameterPath("bucket-name")} is required`);
+  if (config.accessKeyId.trim() == "") throw new Error(`${parameterPath("access-key-id")} is required`);
+  if (config.secretAccessKey.trim() == "") throw new Error(`${parameterPath("secret-access-key")} is required`);
 
-  const endpoint = process.env.R2_ENDPOINT?.trim() || `https://${accountId}.r2.cloudflarestorage.com`;
-  const forcePathStyle = process.env.R2_FORCE_PATH_STYLE?.trim() == "true";
   const client = new S3Client({
     region: "auto",
-    endpoint,
-    forcePathStyle,
+    endpoint: `https://${config.accountId}.r2.cloudflarestorage.com`,
     requestChecksumCalculation: "WHEN_REQUIRED",
     credentials: {
-      accessKeyId,
-      secretAccessKey,
-      sessionToken: sessionToken == "" ? undefined : sessionToken,
+      accessKeyId: config.accessKeyId,
+      secretAccessKey: config.secretAccessKey,
     },
   });
 
-  return new R2ArticleStore(client, bucketName);
+  return new R2ArticleStore(client, config.bucketName);
 };

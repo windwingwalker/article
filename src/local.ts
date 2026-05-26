@@ -1,8 +1,5 @@
 import * as fs from "fs";
 import { lambdaHandler } from "./index";
-import { loadLocalEnv } from "./loadLocalEnv";
-
-loadLocalEnv();
 
 const readEvent = async (): Promise<any> => {
   const eventPath = process.argv[2];
