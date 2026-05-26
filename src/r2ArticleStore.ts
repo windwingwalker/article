@@ -12,7 +12,7 @@ interface R2StoreConfig {
   secretAccessKey: string;
 }
 
-const parameterPath = (name: string): string => `/article/article-data-store/${name}`;
+const parameterPath = (name: string): string => `/blog/r2/${name}`;
 
 const readBodyAsString = async (body: any): Promise<string> => {
   if (body == null) return "";

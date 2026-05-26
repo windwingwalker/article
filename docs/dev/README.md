@@ -24,7 +24,7 @@
 
 `npm run local` reads a Lambda-style event from a JSON file argument. If no file is passed, it reads JSON from stdin.
 
-Article/catalog storage uses R2 credentials from AWS Systems Manager Parameter Store. For local article reads and writes, use AWS SDK credentials that can read `/article/article-data-store/*`.
+Article/catalog storage uses R2 credentials from AWS Systems Manager Parameter Store. For local article reads and writes, use AWS SDK credentials that can read `/blog/r2/*`.
 
 ## How do you call the isolated dev API?
 

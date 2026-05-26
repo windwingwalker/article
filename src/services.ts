@@ -70,6 +70,6 @@ export const postArticleReaderCountService = async (event): Promise<HTTPResponse
 const getReaderCountQueueUrl = async (): Promise<string> => {
   if (process.env.READER_COUNT_QUEUE_URL != null) return process.env.READER_COUNT_QUEUE_URL;
 
-  var accountId: string = await getParameterFromSSM("/article/account-id")
+  var accountId: string = await getParameterFromSSM("/blog/aws/account-id")
   return `https://sqs.us-east-1.amazonaws.com/${accountId}/article-reader-count`
 }
